@@ -1,7 +1,7 @@
 import type { ImageLike } from "./types";
 import { emptyCanvas, flip, fromImageLike, loadImage, rotate, thumbnail } from "./util";
 
-export class ImTool {
+export class ImageTool {
 	private canvas: HTMLCanvasElement;
 	private outputType = "image/jpeg";
 	private outputQuality = 0.7;
@@ -35,7 +35,7 @@ export class ImTool {
 	 * @param width Width.
 	 * @param height Height.
 	 */
-	crop(x: number, y: number, width: number, height: number): ImTool {
+	crop(x: number, y: number, width: number, height: number): ImageTool {
 		const { canvas, ctx } = emptyCanvas(width, height);
 		ctx.drawImage(this.canvas, -x, -y, this.canvas.width, this.canvas.height);
 		this.canvas = canvas;
@@ -48,7 +48,7 @@ export class ImTool {
 	 * @param width New width.
 	 * @param height New height.
 	 */
-	scale(width: number, height: number): ImTool {
+	scale(width: number, height: number): ImageTool {
 		const { canvas, ctx } = emptyCanvas(width, height);
 		ctx.drawImage(this.canvas, 0, 0, width, height);
 		this.canvas = canvas;
@@ -60,7 +60,7 @@ export class ImTool {
 	 * Flips the image.
 	 * @param vertical When true the image will be flipped vertically, otherwise it will be flipped horizontally.
 	 */
-	flip(vertical = false): ImTool {
+	flip(vertical = false): ImageTool {
 		this.canvas = flip(this.canvas, vertical);
 		return this;
 	}
@@ -68,14 +68,14 @@ export class ImTool {
 	/**
 	 * Flips the image horizontally.
 	 */
-	flipH(): ImTool {
+	flipH(): ImageTool {
 		return this.flip(false);
 	}
 
 	/**
 	 * Flips the image vertically.
 	 */
-	flipV(): ImTool {
+	flipV(): ImageTool {
 		return this.flip(true);
 	}
 
@@ -84,7 +84,7 @@ export class ImTool {
 	 * @param maxSize Maximum width or height.
 	 * @param cover When true this will cause the thumbnail to be a square and image will be centered with its smallest dimension becoming as large as maxDimension and the overflow being cut off. Default: false.
 	 */
-	thumbnail(maxSize: number, cover = false): ImTool {
+	thumbnail(maxSize: number, cover = false): ImageTool {
 		this.canvas = thumbnail(this.canvas, maxSize, cover);
 		return this;
 	}
@@ -93,7 +93,7 @@ export class ImTool {
 	 * Rotates the image by a given amount of radians relative to the center of the image. This will change the size of the canvas to fit new image.
 	 * @param rad Radians.
 	 */
-	rotate(rad: number): ImTool {
+	rotate(rad: number): ImageTool {
 		this.canvas = rotate(this.canvas, rad);
 		return this;
 	}
@@ -102,7 +102,7 @@ export class ImTool {
 	 * Rotates the image by a given amount of degrees relative to the center of the image. This will change the size of the canvas to fit new image.
 	 * @param degrees Degrees.
 	 */
-	rotateDeg(degrees: number): ImTool {
+	rotateDeg(degrees: number): ImageTool {
 		return this.rotate((degrees * Math.PI) / 180);
 	}
 
@@ -110,7 +110,7 @@ export class ImTool {
 	 * Sets the canvas background.
 	 * @param color Color can be any valid color string.
 	 */
-	background(color: string): ImTool {
+	background(color: string): ImageTool {
 		const { width, height } = this.canvas;
 		const { canvas, ctx } = emptyCanvas(width, height);
 
@@ -126,7 +126,7 @@ export class ImTool {
 	 * Sets the input type. (Default: image/jpeg)
 	 * @param type Type, can be anything supported by the browser, common examples: image/jpeg and image/png.
 	 */
-	type(type: string): ImTool {
+	type(type: string): ImageTool {
 		this.outputType = type;
 		return this;
 	}
@@ -135,7 +135,7 @@ export class ImTool {
 	 * Sets the quality for lossy compression (like image/jpeg). Default: 0.7.
 	 * @param quality Quality from 0 to 1.
 	 */
-	quality(quality: number): ImTool {
+	quality(quality: number): ImageTool {
 		this.outputQuality = quality;
 		return this;
 	}

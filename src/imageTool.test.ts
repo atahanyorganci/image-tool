@@ -1,6 +1,6 @@
 import { createCanvas } from "canvas";
 import { describe, expect, it } from "vitest";
-import { ImTool } from "./ImTool";
+import { ImageTool } from "./imageTool";
 
 describe("image manipulation", () => {
 	it("crops images", async () => {
@@ -11,7 +11,7 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(100, 100, 1, 1);
 
-		const tool = new ImTool(canvas as unknown as HTMLCanvasElement);
+		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
 		tool.crop(100, 100, 100, 100);
 
 		const newCanvas = await tool.toCanvas();
@@ -32,7 +32,7 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 2, 2);
 
-		const tool = new ImTool(canvas as unknown as HTMLCanvasElement);
+		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
 		tool.scale(100, 100);
 
 		const newCanvas = await tool.toCanvas();
@@ -51,7 +51,7 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#fff";
 		ctx.fillRect(0, 0, 200, 400);
 
-		const tool = new ImTool(canvas as unknown as HTMLCanvasElement);
+		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
 		tool.thumbnail(100, false);
 
 		const newCanvas = await tool.toCanvas();
@@ -66,7 +66,7 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#fff";
 		ctx.fillRect(0, 0, 200, 400);
 
-		const tool = new ImTool(canvas as unknown as HTMLCanvasElement);
+		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
 		tool.thumbnail(100, true);
 
 		const newCanvas = await tool.toCanvas();
@@ -83,7 +83,7 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 1, 1);
 
-		const tool = new ImTool(canvas as unknown as HTMLCanvasElement);
+		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
 		tool.flipV();
 
 		const newCanvas = await tool.toCanvas();
@@ -104,7 +104,7 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 1, 1);
 
-		const tool = new ImTool(canvas as unknown as HTMLCanvasElement);
+		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
 		tool.flipH();
 
 		const newCanvas = await tool.toCanvas();
@@ -125,7 +125,7 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 1, 1);
 
-		const tool = new ImTool(canvas as unknown as HTMLCanvasElement);
+		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
 		tool.rotateDeg(45);
 
 		const newCanvas = await tool.toCanvas();
@@ -142,7 +142,7 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 1, 1);
 
-		const tool = new ImTool(canvas as unknown as HTMLCanvasElement);
+		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
 		tool.rotateDeg(90);
 
 		const newCanvas = await tool.toCanvas();
@@ -163,7 +163,7 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 1, 1);
 
-		const tool = new ImTool(canvas as unknown as HTMLCanvasElement);
+		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
 		tool.rotateDeg(180);
 
 		const newCanvas = await tool.toCanvas();
@@ -184,7 +184,7 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 1, 1);
 
-		const tool = new ImTool(canvas as unknown as HTMLCanvasElement);
+		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
 		tool.rotateDeg(270);
 
 		const newCanvas = await tool.toCanvas();
@@ -205,7 +205,7 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 1, 1);
 
-		const tool = new ImTool(canvas as unknown as HTMLCanvasElement);
+		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
 		tool.rotateDeg(360);
 
 		const newCanvas = await tool.toCanvas();
@@ -225,7 +225,7 @@ describe("image manipulation", () => {
 		ctx.fillRect(0, 0, 100, 100);
 		ctx.clearRect(0, 0, 10, 10);
 
-		const tool = new ImTool(canvas as unknown as HTMLCanvasElement);
+		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
 		tool.background("#dddddd");
 
 		const newCanvas = await tool.toCanvas();

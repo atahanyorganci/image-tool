@@ -1,5 +1,5 @@
 import type { ImageType } from "./types";
-import { ImTool } from "./ImTool";
+import { ImageTool } from "./imageTool";
 import { fileToDataURL, loadImage } from "./util";
 
 export * from "./util";
@@ -8,24 +8,24 @@ export * from "./util";
  * Creates a new instance of ImTool from a <canvas> element.
  * @param canvas The canvas to be loaded.
  */
-export function fromCanvas(canvas: HTMLCanvasElement): Promise<ImTool> {
-	return Promise.resolve(new ImTool(canvas));
+export function fromCanvas(canvas: HTMLCanvasElement): Promise<ImageTool> {
+	return Promise.resolve(new ImageTool(canvas));
 }
 
 /**
  * Creates a new instance of ImTool from a <video> element. (Must be during playback.)
  * @param video
  */
-export function fromVideo(video: HTMLVideoElement): Promise<ImTool> {
-	return Promise.resolve(new ImTool(video));
+export function fromVideo(video: HTMLVideoElement): Promise<ImageTool> {
+	return Promise.resolve(new ImageTool(video));
 }
 
 /**
  * Creates a new instance of ImTool from a MediaStream. (Must contain at least one video track.)
  * @param stream
  */
-export function fromMediaStream(stream: MediaStream): Promise<ImTool> {
-	return new Promise<ImTool>((resolve, reject) => {
+export function fromMediaStream(stream: MediaStream): Promise<ImageTool> {
+	return new Promise<ImageTool>((resolve, reject) => {
 		const video = document.createElement("video");
 		video.srcObject = stream;
 		video.play();
@@ -49,7 +49,7 @@ export function fromMediaStream(stream: MediaStream): Promise<ImTool> {
  * The image be from the same origin, or from an origin accessible to the website.
  * @param image The image to be loaded.
  */
-export async function fromImage(image: ImageType): Promise<ImTool> {
+export async function fromImage(image: ImageType): Promise<ImageTool> {
 	let url: string | undefined;
 
 	if (typeof image === "string") {
@@ -60,7 +60,7 @@ export async function fromImage(image: ImageType): Promise<ImTool> {
 	}
 	else if (image instanceof HTMLImageElement) {
 		if (image.complete && image.naturalWidth === 0) {
-			return Promise.resolve(new ImTool(image));
+			return Promise.resolve(new ImageTool(image));
 		}
 		else {
 			url = image.src;
@@ -69,7 +69,7 @@ export async function fromImage(image: ImageType): Promise<ImTool> {
 
 	if (url) {
 		const img = await loadImage(url);
-		return new ImTool(img);
+		return new ImageTool(img);
 	}
 	else {
 		throw new Error("Unable to load the image.");
@@ -79,7 +79,7 @@ export async function fromImage(image: ImageType): Promise<ImTool> {
 /**
  * Creates a new instance of ImTool from screen capture.
  */
-export async function fromScreen(): Promise<ImTool> {
+export async function fromScreen(): Promise<ImageTool> {
 	if (!navigator.mediaDevices?.getDisplayMedia) {
 		throw new Error("Screen capture is not supported in this browser.");
 	}
@@ -95,7 +95,7 @@ export async function fromScreen(): Promise<ImTool> {
 /**
  * Creates a new instance of ImTool from webcam capture.
  */
-export async function fromWebcam(): Promise<ImTool> {
+export async function fromWebcam(): Promise<ImageTool> {
 	if (!navigator.mediaDevices?.getUserMedia) {
 		throw new Error("Webcam capture is not supported in this browser.");
 	}
