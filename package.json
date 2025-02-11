@@ -1,63 +1,33 @@
 {
-  "name": "imtool",
-  "version": "1.2.1",
-  "description": "Client-side canvas-based image manipulation library.",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "keywords": [
-    "thumbnail",
-    "react",
-    "front-end",
-    "image",
-    "typescript",
-    "canvas",
-    "image manipulation",
-    "screenshot"
-  ],
-  "scripts": {
-    "prepare": "npm run build",
-    "test": "jest",
-    "build": "tsc",
-    "lint": "eslint src"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mat-sz/imtool.git"
-  },
-  "bugs": {
-    "url": "https://github.com/mat-sz/imtool/issues"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
-      "prettier --write"
-    ],
-    "__tests__/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
-      "prettier --write"
-    ]
-  },
-  "homepage": "https://github.com/mat-sz/imtool",
-  "author": "mat-sz <contact@matsz.dev>",
-  "license": "BSD-3-Clause-Clear",
-  "devDependencies": {
-    "@types/jest": "^29.0.0",
-    "@types/node": "^18.7.16",
-    "@types/offscreencanvas": "^2019.7.0",
-    "@typescript-eslint/eslint-plugin": "^5.36.2",
-    "@typescript-eslint/parser": "^5.36.2",
-    "canvas": "^2.10.1",
-    "eslint": "^8.23.0",
-    "husky": "^8.0.1",
-    "jest": "^29.0.2",
-    "jest-environment-jsdom": "^29.0.2",
-    "lint-staged": "^13.0.3",
-    "prettier": "^2.7.1",
-    "ts-jest": "^29.0.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.8.3"
-  }
+	"name": "@yorganci/image-tool",
+	"type": "module",
+	"version": "0.0.0",
+	"packageManager": "pnpm@10.0.0+sha512.b8fef5494bd3fe4cbd4edabd0745df2ee5be3e4b0b8b08fa643aa3e4c6702ccc0f00d68fa8a8c9858a735a0032485a44990ed2810526c875e416f001b17df12b",
+	"description": "Client-side canvas-based image manipulation library.",
+	"author": {
+		"name": "Atahan Yorgancı",
+		"email": "atahanyorganci@hotmail.com"
+	},
+	"license": "BSD-3-Clause-Clear",
+	"homepage": "https://github.com/atahanyorganci/image-tool",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/atahanyorganci/image-tool.git"
+	},
+	"bugs": {
+		"url": "https://github.com/atahanyorganci/image-tool/issues"
+	},
+	"scripts": {
+		"check": "tsc",
+		"check:watch": "tsc --watch",
+		"lint": "eslint .",
+		"lint:fix": "eslint --fix ."
+	},
+	"devDependencies": {
+		"@antfu/eslint-config": "^4.2.0",
+		"@typescript-eslint/eslint-plugin": "^8.24.0",
+		"@typescript-eslint/parser": "^8.24.0",
+		"eslint": "^9.20.1",
+		"typescript": "^5.7.3"
+	}
 }
