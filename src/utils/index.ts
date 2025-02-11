@@ -1,2 +1,2 @@
-export * from './canvas';
-export * from './file';
+export * from "./canvas";
+export * from "./file";

@@ -51,33 +51,33 @@ The source code of the [live demo](https://demo.mat.dev/imtool/) is available he
 ### Load an image, create a thumbnail and export it as data URL
 
 ```js
-import { fromImage } from 'imtool';
+import { fromImage } from "imtool";
 
 async function example() {
-  const tool = await fromImage('./image.png');
-  return await tool.thumbnail(250).toDataURL();
+	const tool = await fromImage("./image.png");
+	return await tool.thumbnail(250).toDataURL();
 }
 ```
 
 ### Load a screenshot, crop a part of it and export it as a Blob
 
 ```js
-import { fromScreen } from 'imtool';
+import { fromScreen } from "imtool";
 
 async function example() {
-  const tool = await fromScreen();
-  return await tool.crop(50, 50, 200, 200).toBlob();
+	const tool = await fromScreen();
+	return await tool.crop(50, 50, 200, 200).toBlob();
 }
 ```
 
 ### Load a webcam capture, crop a part of it, create a thumbnail and export as data URL
 
 ```js
-import { fromWebcam } from 'imtool';
+import { fromWebcam } from "imtool";
 
 async function example() {
-  const tool = await fromWebcam();
-  return await tool.crop(50, 50, 500, 500).thumbnail(250).toDataURL();
+	const tool = await fromWebcam();
+	return await tool.crop(50, 50, 500, 500).thumbnail(250).toDataURL();
 }
 ```
 
