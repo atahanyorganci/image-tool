@@ -17,7 +17,22 @@
 	"bugs": {
 		"url": "https://github.com/atahanyorganci/image-tool/issues"
 	},
+	"sideEffects": false,
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"main": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist"
+	],
 	"scripts": {
+		"build": "unbuild",
 		"check": "tsc",
 		"check:watch": "tsc --watch",
 		"lint": "eslint .",
@@ -32,9 +47,12 @@
 		"eslint": "^9.20.1",
 		"jsdom": "^26.0.0",
 		"typescript": "^5.7.3",
+		"unbuild": "^3.3.1",
 		"vitest": "^3.0.5"
 	},
 	"pnpm": {
-		"onlyBuiltDependencies": ["canvas"]
+		"onlyBuiltDependencies": [
+			"canvas"
+		]
 	}
 }
