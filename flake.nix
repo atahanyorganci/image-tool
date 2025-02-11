@@ -21,6 +21,13 @@
           '';
           buildInputs = with pkgs; [
             nodejs_22
+            pkg-config
+            cairo
+            pango
+            libpng
+            libjpeg
+            giflib
+            librsvg
           ];
         };
       in
