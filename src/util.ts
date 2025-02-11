@@ -1,5 +1,4 @@
-import type { ImageLike } from "../types";
-import { fileToDataURL, loadImage } from ".";
+import type { ImageLike } from "./types";
 
 /**
  * Builds an empty canvas.
@@ -194,4 +193,37 @@ export async function fromFile(file: Blob): Promise<HTMLCanvasElement> {
 	else {
 		throw new Error("Unable to load the image.");
 	}
+}
+
+export function fileToDataURL(file: Blob): Promise<string> {
+	return new Promise<string>((resolve, reject) => {
+		const reader = new FileReader();
+
+		reader.addEventListener("load", () => {
+			resolve(reader.result as string);
+		});
+
+		reader.addEventListener("error", (error) => {
+			reject(error);
+		});
+
+		reader.readAsDataURL(file);
+	});
+}
+
+export function loadImage(src: string): Promise<HTMLImageElement> {
+	return new Promise<HTMLImageElement>((resolve, reject) => {
+		const img = new Image();
+
+		img.onload = () => {
+			resolve(img);
+		};
+
+		img.onerror = (err) => {
+			// The image couldn't be loaded.
+			reject(err);
+		};
+
+		img.src = src;
+	});
 }

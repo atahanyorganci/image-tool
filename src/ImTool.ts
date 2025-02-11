@@ -1,12 +1,5 @@
 import type { ImageLike } from "./types";
-import {
-	emptyCanvas,
-	flip,
-	fromImageLike,
-	loadImage,
-	rotate,
-	thumbnail,
-} from "./utils";
+import { emptyCanvas, flip, fromImageLike, loadImage, rotate, thumbnail } from "./util";
 
 export class ImTool {
 	private canvas: HTMLCanvasElement;
