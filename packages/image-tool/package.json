@@ -12,7 +12,7 @@
 	"homepage": "https://github.com/atahanyorganci/image-tool",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/atahanyorganci/image-tool.git"
+		"url": "git+https://github.com/atahanyorganci/image-tool.git"
 	},
 	"bugs": {
 		"url": "https://github.com/atahanyorganci/image-tool/issues"
