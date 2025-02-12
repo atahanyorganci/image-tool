@@ -5,6 +5,8 @@
 [![bundle][bundle-src]][bundle-href]
 [![License][license-src]][license-href]
 
+HTML canvas-based TypeScript image manipulation library.
+
 ## Quickstart
 
 ```sh
