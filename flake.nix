@@ -21,6 +21,7 @@
           '';
           buildInputs = with pkgs; [
             nodejs_22
+            just
             pkg-config
             cairo
             pango
