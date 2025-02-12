@@ -1,4 +1,7 @@
-export type ImageType = string | Blob | File | HTMLImageElement;
+/**
+ * Image like HTML element, offscreen canvas or image bitmap.
+ * @public
+ */
 export type ImageLike =
 	| HTMLCanvasElement
 	| HTMLImageElement

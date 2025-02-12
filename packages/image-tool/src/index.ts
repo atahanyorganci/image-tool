@@ -1,113 +1,12 @@
-import type { ImageType } from "./types";
-import { ImageTool } from "./imageTool";
-import { fileToDataURL, loadImage } from "./util";
-
-export { ImageTool } from "./imageTool";
-export * from "./types";
-export * from "./util";
-
-/**
- * Creates a new instance of ImTool from a <canvas> element.
- * @param canvas - The canvas to be loaded.
- */
-export function fromCanvas(canvas: HTMLCanvasElement): Promise<ImageTool> {
-	return Promise.resolve(new ImageTool(canvas));
-}
-
-/**
- * Creates a new instance of ImTool from a <video> element. (Must be during playback.)
- * @param video - The video to be loaded.
- */
-export function fromVideo(video: HTMLVideoElement): Promise<ImageTool> {
-	return Promise.resolve(new ImageTool(video));
-}
-
-/**
- * Creates a new instance of ImTool from a MediaStream. (Must contain at least one video track.)
- * @param stream - The stream to be loaded.
- */
-export function fromMediaStream(stream: MediaStream): Promise<ImageTool> {
-	return new Promise<ImageTool>((resolve, reject) => {
-		const video = document.createElement("video");
-		video.srcObject = stream;
-		video.play();
-		video.addEventListener("playing", async () => {
-			const tool = await fromVideo(video);
-
-			// Stop tracks to get rid of browser's streaming notification.
-			video.srcObject = null;
-			stream.getTracks().forEach(track => track.stop());
-			resolve(tool);
-		});
-
-		video.addEventListener("error", (e) => {
-			reject(e);
-		});
-	});
-}
-
-/**
- * Creates a new instance of ImTool from an image URL, Blob, File or an <img> element.
- * The image be from the same origin, or from an origin accessible to the website.
- * @param image - The image to be loaded.
- */
-export async function fromImage(image: ImageType): Promise<ImageTool> {
-	let url: string | undefined;
-
-	if (typeof image === "string") {
-		url = image;
-	}
-	else if (image instanceof Blob) {
-		url = await fileToDataURL(image);
-	}
-	else if (image instanceof HTMLImageElement) {
-		if (image.complete && image.naturalWidth === 0) {
-			return Promise.resolve(new ImageTool(image));
-		}
-		else {
-			url = image.src;
-		}
-	}
-
-	if (url) {
-		const img = await loadImage(url);
-		return new ImageTool(img);
-	}
-	else {
-		throw new Error("Unable to load the image.");
-	}
-}
-
-/**
- * Creates a new instance of ImTool from screen capture.
- */
-export async function fromScreen(): Promise<ImageTool> {
-	if (!navigator.mediaDevices?.getDisplayMedia) {
-		throw new Error("Screen capture is not supported in this browser.");
-	}
-	const stream = await navigator.mediaDevices.getDisplayMedia({
-		video: true,
-	});
-	if (!stream) {
-		throw new Error("Unable to start screen capture.");
-	}
-	return await fromMediaStream(stream);
-}
-
-/**
- * Creates a new instance of ImTool from webcam capture.
- */
-export async function fromWebcam(): Promise<ImageTool> {
-	if (!navigator.mediaDevices?.getUserMedia) {
-		throw new Error("Webcam capture is not supported in this browser.");
-	}
-	const stream = await navigator.mediaDevices.getUserMedia({
-		video: true,
-	});
-
-	if (!stream) {
-		throw new Error("Unable to start webcam capture.");
-	}
-
-	return await fromMediaStream(stream);
-}
+export {
+	emptyImage,
+	fromBlob,
+	fromImageLike,
+	fromImageSource,
+	fromMediaStream,
+	fromScreen,
+	fromWebcam,
+} from "./factory";
+export { type ImageOptions, ImageTool } from "./imageTool";
+export type { ImageLike } from "./types";
+export { isTainted } from "./util";

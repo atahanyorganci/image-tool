@@ -11,16 +11,15 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(100, 100, 1, 1);
 
-		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		tool.crop(100, 100, 100, 100);
+		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
+		const cropped = await source.crop(100, 100, 100, 100).toCanvas();
 
-		const newCanvas = await tool.toCanvas();
+		expect(cropped.width).toBe(100);
+		expect(cropped.height).toBe(100);
 
-		expect(newCanvas.width).toBe(100);
-		expect(newCanvas.height).toBe(100);
-
-		const newCtx = newCanvas.getContext("2d")!;
+		const newCtx = cropped.getContext("2d")!;
 		const data = newCtx.getImageData(0, 0, 1, 1);
+
 		expect(Array.from(data.data)).toEqual([255, 0, 0, 255]);
 	});
 
@@ -32,15 +31,13 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 2, 2);
 
-		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		tool.scale(100, 100);
+		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
+		const scaled = await source.scale(100, 100).toCanvas();
 
-		const newCanvas = await tool.toCanvas();
+		expect(scaled.width).toBe(100);
+		expect(scaled.height).toBe(100);
 
-		expect(newCanvas.width).toBe(100);
-		expect(newCanvas.height).toBe(100);
-
-		const newCtx = newCanvas.getContext("2d")!;
+		const newCtx = scaled.getContext("2d")!;
 		const data = newCtx.getImageData(0, 0, 1, 1);
 		expect(Array.from(data.data)).toEqual([255, 0, 0, 255]);
 	});
@@ -51,13 +48,11 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#fff";
 		ctx.fillRect(0, 0, 200, 400);
 
-		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		tool.thumbnail(100, false);
+		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
+		const thumbnail = await source.thumbnail(100, false).toCanvas();
 
-		const newCanvas = await tool.toCanvas();
-
-		expect(newCanvas.width).toBe(50);
-		expect(newCanvas.height).toBe(100);
+		expect(thumbnail.width).toBe(50);
+		expect(thumbnail.height).toBe(100);
 	});
 
 	it("creates thumbnails (cover: true)", async () => {
@@ -66,13 +61,11 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#fff";
 		ctx.fillRect(0, 0, 200, 400);
 
-		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		tool.thumbnail(100, true);
+		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
+		const thumbnail = await source.thumbnail(100, true).toCanvas();
 
-		const newCanvas = await tool.toCanvas();
-
-		expect(newCanvas.width).toBe(100);
-		expect(newCanvas.height).toBe(100);
+		expect(thumbnail.width).toBe(100);
+		expect(thumbnail.height).toBe(100);
 	});
 
 	it("flips images vertically", async () => {
@@ -84,14 +77,12 @@ describe("image manipulation", () => {
 		ctx.fillRect(0, 0, 1, 1);
 
 		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		tool.flipV();
+		const flipped = await tool.flipVertical().toCanvas();
 
-		const newCanvas = await tool.toCanvas();
+		expect(flipped.width).toBe(200);
+		expect(flipped.height).toBe(200);
 
-		expect(newCanvas.width).toBe(200);
-		expect(newCanvas.height).toBe(200);
-
-		const newCtx = newCanvas.getContext("2d")!;
+		const newCtx = flipped.getContext("2d")!;
 		const data = newCtx.getImageData(0, 199, 1, 1);
 		expect(Array.from(data.data)).toEqual([255, 0, 0, 255]);
 	});
@@ -104,15 +95,13 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 1, 1);
 
-		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		tool.flipH();
+		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
+		const flipped = await source.flipHorizontal().toCanvas();
 
-		const newCanvas = await tool.toCanvas();
+		expect(flipped.width).toBe(200);
+		expect(flipped.height).toBe(200);
 
-		expect(newCanvas.width).toBe(200);
-		expect(newCanvas.height).toBe(200);
-
-		const newCtx = newCanvas.getContext("2d")!;
+		const newCtx = flipped.getContext("2d")!;
 		const data = newCtx.getImageData(199, 0, 1, 1);
 		expect(Array.from(data.data)).toEqual([255, 0, 0, 255]);
 	});
@@ -125,13 +114,11 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 1, 1);
 
-		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		tool.rotateDeg(45);
+		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
+		const rotate45 = await source.rotateDeg(45).toCanvas();
 
-		const newCanvas = await tool.toCanvas();
-
-		expect(newCanvas.width).toBe(212);
-		expect(newCanvas.height).toBe(212);
+		expect(rotate45.width).toBe(212);
+		expect(rotate45.height).toBe(212);
 	});
 
 	it("rotates the image (90deg)", async () => {
@@ -142,15 +129,13 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 1, 1);
 
-		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		tool.rotateDeg(90);
+		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
+		const rotate90 = await source.rotateDeg(90).toCanvas();
 
-		const newCanvas = await tool.toCanvas();
+		expect(rotate90.width).toBe(200);
+		expect(rotate90.height).toBe(100);
 
-		expect(newCanvas.width).toBe(200);
-		expect(newCanvas.height).toBe(100);
-
-		const newCtx = newCanvas.getContext("2d")!;
+		const newCtx = rotate90.getContext("2d")!;
 		const data = newCtx.getImageData(199, 0, 1, 1);
 		expect(Array.from(data.data)).toEqual([255, 0, 0, 255]);
 	});
@@ -163,15 +148,13 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 1, 1);
 
-		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		tool.rotateDeg(180);
+		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
+		const rotate180 = await source.rotateDeg(180).toCanvas();
 
-		const newCanvas = await tool.toCanvas();
+		expect(rotate180.width).toBe(100);
+		expect(rotate180.height).toBe(200);
 
-		expect(newCanvas.width).toBe(100);
-		expect(newCanvas.height).toBe(200);
-
-		const newCtx = newCanvas.getContext("2d")!;
+		const newCtx = rotate180.getContext("2d")!;
 		const data = newCtx.getImageData(99, 199, 1, 1);
 		expect(Array.from(data.data)).toEqual([255, 0, 0, 255]);
 	});
@@ -184,15 +167,13 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 1, 1);
 
-		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		tool.rotateDeg(270);
+		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
+		const rotate270 = await source.rotateDeg(270).toCanvas();
 
-		const newCanvas = await tool.toCanvas();
+		expect(rotate270.width).toBe(200);
+		expect(rotate270.height).toBe(100);
 
-		expect(newCanvas.width).toBe(200);
-		expect(newCanvas.height).toBe(100);
-
-		const newCtx = newCanvas.getContext("2d")!;
+		const newCtx = rotate270.getContext("2d")!;
 		const data = newCtx.getImageData(0, 99, 1, 1);
 		expect(Array.from(data.data)).toEqual([255, 0, 0, 255]);
 	});
@@ -205,15 +186,13 @@ describe("image manipulation", () => {
 		ctx.fillStyle = "#f00";
 		ctx.fillRect(0, 0, 1, 1);
 
-		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		tool.rotateDeg(360);
+		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
+		const rotate360 = await source.rotateDeg(360).toCanvas();
 
-		const newCanvas = await tool.toCanvas();
+		expect(rotate360.width).toBe(100);
+		expect(rotate360.height).toBe(200);
 
-		expect(newCanvas.width).toBe(100);
-		expect(newCanvas.height).toBe(200);
-
-		const newCtx = newCanvas.getContext("2d")!;
+		const newCtx = rotate360.getContext("2d")!;
 		const data = newCtx.getImageData(0, 0, 1, 1);
 		expect(Array.from(data.data)).toEqual([255, 0, 0, 255]);
 	});
@@ -225,15 +204,13 @@ describe("image manipulation", () => {
 		ctx.fillRect(0, 0, 100, 100);
 		ctx.clearRect(0, 0, 10, 10);
 
-		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		tool.background("#dddddd");
+		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
+		const background = await source.background("#dddddd").toCanvas();
 
-		const newCanvas = await tool.toCanvas();
+		expect(background.width).toBe(100);
+		expect(background.height).toBe(100);
 
-		expect(newCanvas.width).toBe(100);
-		expect(newCanvas.height).toBe(100);
-
-		const newCtx = newCanvas.getContext("2d")!;
+		const newCtx = background.getContext("2d")!;
 		const dataCleared = newCtx.getImageData(0, 0, 1, 1);
 		expect(Array.from(dataCleared.data)).toEqual([221, 221, 221, 255]);
 
