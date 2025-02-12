@@ -1,9 +1,22 @@
 import antfu from "@antfu/eslint-config";
 
-export default antfu({
+const config = antfu({
 	stylistic: {
 		indent: "tab",
 		quotes: "double",
 		semi: true,
 	},
+}).append({
+	rules: {
+		"ts/explicit-function-return-type": [
+			"error",
+			{
+				allowExpressions: true,
+				allowTypedFunctionExpressions: true,
+				allowHigherOrderFunctions: true,
+			},
+		],
+	},
 });
+
+export default config;
