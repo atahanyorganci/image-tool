@@ -1,12 +1,6 @@
-import antfu from "@antfu/eslint-config";
+import { imageTool } from "@yorganci/image-tool-eslint-config";
 
-const config = antfu({
-	stylistic: {
-		indent: "tab",
-		quotes: "double",
-		semi: true,
-	},
-}).append({
+const config = imageTool().append({
 	rules: {
 		"ts/explicit-function-return-type": [
 			"error",

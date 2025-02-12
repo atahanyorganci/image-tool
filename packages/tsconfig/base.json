@@ -1,0 +1,36 @@
+{
+	"compilerOptions": {
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitOverride": true,
+		"noImplicitThis": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"strict": true,
+		"useUnknownInCatchVariables": true,
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"resolveJsonModule": true,
+		"noEmit": true,
+		"allowJs": true,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
+		"jsx": "preserve",
+		"lib": ["ESNext"],
+		"moduleDetection": "force",
+		"target": "ESNext",
+		"composite": true,
+		"incremental": true,
+		"tsBuildInfoFile": "${configDir}/node_modules/.tmp/tsbuildinfo.json",
+		"skipLibCheck": true,
+		"baseUrl": ".",
+		"paths": {
+			"~/*": ["${configDir}/src/*"]
+		}
+	},
+	"include": ["${configDir}/src/**/*.ts"],
+	"exclude": ["${configDir}/node_modules"]
+}

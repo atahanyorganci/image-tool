@@ -5,9 +5,9 @@
 	"exports": {
 		".": "./src/index.ts"
 	},
+	"license": "BSD-3-Clause-Clear",
 	"publish": {
 		"include": [
-			"LICENSE",
 			"README.md",
 			"src/**/*.ts"
 		],

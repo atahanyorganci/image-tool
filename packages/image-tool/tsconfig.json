@@ -1,0 +1,6 @@
+{
+	"extends": "@yorganci/image-tool-tsconfig/base",
+	"compilerOptions": {
+		"lib": ["ESNext", "DOM"]
+	}
+}
