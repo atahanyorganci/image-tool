@@ -7,11 +7,15 @@
 
 HTML canvas-based TypeScript image manipulation library.
 
-## Monorepo Structure
+## Quickstart
 
-- [`@yorganci/image-tool-eslint-config`](./packages/eslint-config/package.json)
-- [`@yorganci/image-tool`](./packages/image-tool/README.md)
-- [`@yorganci/image-tool-tsconfig`](./packages/tsconfig/package.json)
+```sh
+npm install @yorganci/image-tool
+# or:
+yarn add @yorganci/image-tool
+# or
+pnpm add @yorganci/image-tool
+```
 
 [npm-version-src]: https://img.shields.io/npm/v/@yorganci/image-tool?style=for-the-badge&logo=git&label=release
 [npm-version-href]: https://npmjs.com/package/@yorganci/image-tool
