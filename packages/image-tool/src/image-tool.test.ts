@@ -1,6 +1,6 @@
 import { createCanvas } from "canvas";
 import { describe, expect, it } from "vitest";
-import { ImageTool } from "./imageTool";
+import { ImageTool } from "./image-tool";
 
 describe("image manipulation", () => {
 	it("crops images", async () => {

@@ -1,5 +1,5 @@
 import type { ImageLike } from "./types";
-import { ImageTool } from "./imageTool";
+import { ImageTool } from "./image-tool";
 import { emptyCanvas, fileToDataURL, isTainted } from "./util";
 
 /**
