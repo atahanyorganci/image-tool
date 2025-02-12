@@ -131,3 +131,6 @@ dist
 
 # Tsup
 .tsup
+
+# Turborepo
+.turbo

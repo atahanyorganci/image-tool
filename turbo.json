@@ -1,0 +1,19 @@
+{
+	"$schema": "https://turbo.build/schema.json",
+	"tasks": {
+		"check": {
+			"inputs": ["src/**/*.ts"]
+		},
+		"check:watch": {
+			"cache": false,
+			"persistent": true
+		},
+		"lint": {},
+		"lint:fix": {
+			"cache": false
+		},
+		"build": {
+			"dependsOn": ["check", "lint"]
+		}
+	}
+}
