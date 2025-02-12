@@ -2,8 +2,8 @@ import type { ImageLike } from "./types";
 
 /**
  * Builds an empty canvas.
- * @param width Width in pixels.
- * @param height Height in pixels.
+ * @param width - Width in pixels.
+ * @param height - Height in pixels.
  * @returns The new canvas and the corresponding context.
  */
 export function emptyCanvas(width: number, height: number): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
@@ -37,8 +37,8 @@ export function isTainted(ctx: CanvasRenderingContext2D): boolean {
 
 /**
  * Flips the image.
- * @param input The image to flip.
- * @param vertical When true the image will be flipped vertically, otherwise it will be flipped horizontally.
+ * @param input - The image to flip.
+ * @param vertical - When true the image will be flipped vertically, otherwise it will be flipped horizontally.
  */
 export function flip(input: HTMLCanvasElement, vertical = false): HTMLCanvasElement {
 	const { width, height } = input;
@@ -59,9 +59,9 @@ export function flip(input: HTMLCanvasElement, vertical = false): HTMLCanvasElem
 
 /**
  * Generates a thumbnail.
- * @param input The image to generate a thumbnail from.
- * @param maxSize Maximum width or height.
- * @param cover When true this will cause the thumbnail to be a square and image will be centered with its smallest dimension becoming as large as maxDimension and the overflow being cut off. Default: false.
+ * @param input - The image to generate a thumbnail from.
+ * @param maxSize - Maximum width or height.
+ * @param cover - When true this will cause the thumbnail to be a square and image will be centered with its smallest dimension becoming as large as maxDimension and the overflow being cut off. Default: false.
  */
 export function thumbnail(input: HTMLCanvasElement, maxSize: number, cover = false): HTMLCanvasElement {
 	let scale = 1;
@@ -111,8 +111,8 @@ export function thumbnail(input: HTMLCanvasElement, maxSize: number, cover = fal
 
 /**
  * Rotates the image by a given amount of radians relative to the center of the image. This will change the size of the canvas to fit new image.
- * @param input The image to rotate.
- * @param rad The amount of radians to rotate the image by.
+ * @param input - The image to rotate.
+ * @param rad - The amount of radians to rotate the image by.
  */
 export function rotate(input: HTMLCanvasElement, rad: number): HTMLCanvasElement {
 	let angle = rad % (Math.PI * 2);

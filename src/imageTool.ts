@@ -12,7 +12,7 @@ export class ImageTool {
 	/**
 	 * Constructs a new ImTool instance from a loaded image.
 	 * Do not use this directly, use from* functions from index.ts instead.
-	 * @param image Loaded image. Must be from the same origin, or from an origin accessible to the website.
+	 * @param image - Loaded image. Must be from the same origin, or from an origin accessible to the website.
 	 */
 	constructor(image: ImageLike) {
 		this.canvas = fromImageLike(image);
@@ -30,10 +30,10 @@ export class ImageTool {
 
 	/**
 	 * Crops the image.
-	 * @param x Horizontal offset.
-	 * @param y Vertical offset.
-	 * @param width Width.
-	 * @param height Height.
+	 * @param x - Horizontal offset.
+	 * @param y - Vertical offset.
+	 * @param width - Width.
+	 * @param height - Height.
 	 */
 	crop(x: number, y: number, width: number, height: number): ImageTool {
 		const { canvas, ctx } = emptyCanvas(width, height);
@@ -45,8 +45,8 @@ export class ImageTool {
 
 	/**
 	 * Scales the image, doesn't preserve ratio.
-	 * @param width New width.
-	 * @param height New height.
+	 * @param width - New width.
+	 * @param height - New height.
 	 */
 	scale(width: number, height: number): ImageTool {
 		const { canvas, ctx } = emptyCanvas(width, height);
@@ -58,7 +58,7 @@ export class ImageTool {
 
 	/**
 	 * Flips the image.
-	 * @param vertical When true the image will be flipped vertically, otherwise it will be flipped horizontally.
+	 * @param vertical - When true the image will be flipped vertically, otherwise it will be flipped horizontally.
 	 */
 	flip(vertical = false): ImageTool {
 		this.canvas = flip(this.canvas, vertical);
@@ -81,8 +81,8 @@ export class ImageTool {
 
 	/**
 	 * Generates a thumbnail.
-	 * @param maxSize Maximum width or height.
-	 * @param cover When true this will cause the thumbnail to be a square and image will be centered with its smallest dimension becoming as large as maxDimension and the overflow being cut off. Default: false.
+	 * @param maxSize - Maximum width or height.
+	 * @param cover - When true this will cause the thumbnail to be a square and image will be centered with its smallest dimension becoming as large as maxDimension and the overflow being cut off. Default: false.
 	 */
 	thumbnail(maxSize: number, cover = false): ImageTool {
 		this.canvas = thumbnail(this.canvas, maxSize, cover);
@@ -91,7 +91,7 @@ export class ImageTool {
 
 	/**
 	 * Rotates the image by a given amount of radians relative to the center of the image. This will change the size of the canvas to fit new image.
-	 * @param rad Radians.
+	 * @param rad - Radians.
 	 */
 	rotate(rad: number): ImageTool {
 		this.canvas = rotate(this.canvas, rad);
@@ -100,7 +100,7 @@ export class ImageTool {
 
 	/**
 	 * Rotates the image by a given amount of degrees relative to the center of the image. This will change the size of the canvas to fit new image.
-	 * @param degrees Degrees.
+	 * @param degrees - Degrees.
 	 */
 	rotateDeg(degrees: number): ImageTool {
 		return this.rotate((degrees * Math.PI) / 180);
@@ -108,7 +108,7 @@ export class ImageTool {
 
 	/**
 	 * Sets the canvas background.
-	 * @param color Color can be any valid color string.
+	 * @param color - Color can be any valid color string.
 	 */
 	background(color: string): ImageTool {
 		const { width, height } = this.canvas;
@@ -124,7 +124,7 @@ export class ImageTool {
 
 	/**
 	 * Sets the input type. (Default: image/jpeg)
-	 * @param type Type, can be anything supported by the browser, common examples: image/jpeg and image/png.
+	 * @param type - Type, can be anything supported by the browser, common examples: image/jpeg and image/png.
 	 */
 	type(type: string): ImageTool {
 		this.outputType = type;
@@ -133,7 +133,7 @@ export class ImageTool {
 
 	/**
 	 * Sets the quality for lossy compression (like image/jpeg). Default: 0.7.
-	 * @param quality Quality from 0 to 1.
+	 * @param quality - Quality from 0 to 1.
 	 */
 	quality(quality: number): ImageTool {
 		this.outputQuality = quality;
@@ -210,7 +210,7 @@ export class ImageTool {
 
 	/**
 	 * Downloads the resulting image.
-	 * @param name
+	 * @param name - File name.
 	 */
 	async toDownload(name: string): Promise<void> {
 		const url = await this.toDataURL();
@@ -224,7 +224,7 @@ export class ImageTool {
 
 	/**
 	 * Exports the resulting image as File.
-	 * @param name
+	 * @param name - File name.
 	 */
 	async toFile(name: string): Promise<File> {
 		const blob = await this.toBlob();

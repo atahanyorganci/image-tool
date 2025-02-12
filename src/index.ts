@@ -2,11 +2,13 @@ import type { ImageType } from "./types";
 import { ImageTool } from "./imageTool";
 import { fileToDataURL, loadImage } from "./util";
 
+export { ImageTool } from "./imageTool";
+export * from "./types";
 export * from "./util";
 
 /**
  * Creates a new instance of ImTool from a <canvas> element.
- * @param canvas The canvas to be loaded.
+ * @param canvas - The canvas to be loaded.
  */
 export function fromCanvas(canvas: HTMLCanvasElement): Promise<ImageTool> {
 	return Promise.resolve(new ImageTool(canvas));
@@ -14,7 +16,7 @@ export function fromCanvas(canvas: HTMLCanvasElement): Promise<ImageTool> {
 
 /**
  * Creates a new instance of ImTool from a <video> element. (Must be during playback.)
- * @param video
+ * @param video - The video to be loaded.
  */
 export function fromVideo(video: HTMLVideoElement): Promise<ImageTool> {
 	return Promise.resolve(new ImageTool(video));
@@ -22,7 +24,7 @@ export function fromVideo(video: HTMLVideoElement): Promise<ImageTool> {
 
 /**
  * Creates a new instance of ImTool from a MediaStream. (Must contain at least one video track.)
- * @param stream
+ * @param stream - The stream to be loaded.
  */
 export function fromMediaStream(stream: MediaStream): Promise<ImageTool> {
 	return new Promise<ImageTool>((resolve, reject) => {
@@ -47,7 +49,7 @@ export function fromMediaStream(stream: MediaStream): Promise<ImageTool> {
 /**
  * Creates a new instance of ImTool from an image URL, Blob, File or an <img> element.
  * The image be from the same origin, or from an origin accessible to the website.
- * @param image The image to be loaded.
+ * @param image - The image to be loaded.
  */
 export async function fromImage(image: ImageType): Promise<ImageTool> {
 	let url: string | undefined;
