@@ -36,9 +36,10 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: Install dependencies
         run: pnpm install
-      - name: Build package
-        run: pnpm run build
+      - name: Run pre-publish script
+        run: pnpm turbo run pre-publish --filter @yorganci/image-tool
       - run: npm publish --provenance --access public
+        working-directory: packages/image-tool
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   jsr:
@@ -71,4 +72,7 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install
+      - name: Run pre-publish script
+        run: pnpm turbo run pre-publish --filter @yorganci/image-tool
       - run: pnpm dlx jsr publish
+        working-directory: packages/image-tool

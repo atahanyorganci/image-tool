@@ -1,7 +1,19 @@
 {
 	"$schema": "https://turbo.build/schema.json",
 	"tasks": {
-		"//#format": {},
+		"//#lint": {},
+		"//#lint:fix": {
+			"cache": false
+		},
+		"attw": {
+			"dependsOn": ["build"]
+		},
+		"api-extractor": {
+			"dependsOn": ["build"]
+		},
+		"build": {
+			"dependsOn": ["check", "lint"]
+		},
 		"check": {
 			"inputs": ["src/**/*.ts"]
 		},
@@ -9,14 +21,13 @@
 			"cache": false,
 			"persistent": true
 		},
-		"lint": {
-			"dependsOn": ["//#format"]
+		"ci": {
+			"dependsOn": ["build", "test", "attw", "api-extractor"]
 		},
+		"lint": {},
 		"lint:fix": {
 			"cache": false
 		},
-		"build": {
-			"dependsOn": ["check", "lint"]
-		}
+		"test": {}
 	}
 }

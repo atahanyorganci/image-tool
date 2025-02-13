@@ -1,25 +1,8 @@
 name    := `jq -r '.name' package.json`
 version := `jq -r '.version' package.json`
 
-attw:
-    pnpm run attw
-
-build:
-    pnpm run build
-
-check:
-    pnpm run check
-
-lint:
-    pnpm run lint
-
-test:
-    pnpm run test
-
-ci: check lint test
-
-@pre-publish: ci build attw
-    echo "Ready for publishing"
+pre-publish:
+    pnpm run -w turbo run pre-publish --filter "@yorganci/image-tool"
 
 [private]
 is-clean:
