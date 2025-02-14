@@ -15,7 +15,8 @@
 			"dependsOn": ["check", "lint"]
 		},
 		"check": {
-			"inputs": ["src/**/*.ts"]
+			"dependsOn": ["^build"],
+			"inputs": ["src/**/*"]
 		},
 		"check:watch": {
 			"cache": false,

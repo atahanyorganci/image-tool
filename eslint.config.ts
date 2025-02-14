@@ -4,5 +4,6 @@ export default imageTool().append({
 	ignores: [
 		"packages/image-tool",
 		"packages/eslint-config",
+		"packages/web",
 	],
 });

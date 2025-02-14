@@ -1,0 +1,32 @@
+{
+	"name": "@yorganci/image-tool-web",
+	"type": "module",
+	"private": true,
+	"license": "BSD-3-Clause-Clear",
+	"scripts": {
+		"build": "vite build",
+		"check": "tsc",
+		"check:watch": "tsc --watch",
+		"dev": "vite",
+		"lint": "eslint .",
+		"lint:fix": "eslint --fix .",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0"
+	},
+	"devDependencies": {
+		"@tailwindcss/vite": "^4.0.6",
+		"@types/react": "^19.0.8",
+		"@types/react-dom": "^19.0.3",
+		"@vitejs/plugin-react": "^4.3.4",
+		"@yorganci/image-tool-eslint-config": "workspace:*",
+		"@yorganci/image-tool-tsconfig": "workspace:*",
+		"eslint": "^9.19.0",
+		"globals": "^15.14.0",
+		"tailwindcss": "^4.0.6",
+		"typescript": "~5.7.2",
+		"vite": "^6.1.0"
+	}
+}
