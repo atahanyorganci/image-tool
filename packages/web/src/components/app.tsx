@@ -29,7 +29,7 @@ const Dropzone: FC = () => {
 };
 
 const App: FC = () => (
-	<div className="bg-background text-foreground min-h-screen flex flex-col w-full">
+	<div className="min-h-screen flex flex-col w-full">
 		<Dropzone />
 	</div>
 );
