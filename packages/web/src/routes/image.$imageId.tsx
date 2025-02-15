@@ -1,19 +1,17 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import type { ImageTool } from "@yorganci/image-tool";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { fromImageSource } from "@yorganci/image-tool";
 import {
-	type ComponentPropsWithoutRef,
-	createContext,
-	type FC,
-	type PropsWithChildren,
-	useContext,
+	type MouseEventHandler,
+	useCallback,
 	useEffect,
 	useMemo,
-	useRef,
 	useState,
 } from "react";
+import Canvas from "~/components/canvas/canvas";
+import Image from "~/components/canvas/image";
 import { dexie } from "~/lib/db";
+import { cn } from "~/lib/utils";
 
 function useClientSize() {
 	const [size, setSize] = useState({
@@ -34,84 +32,6 @@ function useClientSize() {
 	return size;
 }
 
-export interface CanvasContextValue {
-	ctx?: CanvasRenderingContext2D;
-}
-
-const CanvasContext = createContext<CanvasContextValue>({});
-
-function useCanvasRenderingContext() {
-	const canvas = useContext(CanvasContext);
-	if (!canvas) {
-		throw new Error("Canvas context not found");
-	}
-	return canvas.ctx;
-}
-
-const Canvas: FC<PropsWithChildren<ComponentPropsWithoutRef<"canvas">>> = ({ children, width, height, ...props }) => {
-	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null);
-	useEffect(() => {
-		const canvas = canvasRef.current;
-		if (!canvas) {
-			throw new Error("Canvas not found");
-		}
-		const ctx = canvas.getContext("2d");
-		if (!ctx) {
-			throw new Error("Context not found");
-		}
-		setCtx(ctx);
-	}, [width, height]);
-
-	return (
-		<CanvasContext value={ctx ? { ctx } : {}}>
-			<canvas ref={canvasRef} width={width} height={height} {...props} />
-			{children}
-		</CanvasContext>
-	);
-};
-
-interface RectProps {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-	fillStyle: string;
-}
-
-const Rect: FC<RectProps> = ({ x, y, width, height, fillStyle }) => {
-	const ctx = useCanvasRenderingContext();
-	useEffect(() => {
-		if (!ctx) {
-			return;
-		}
-		ctx.fillStyle = fillStyle;
-		ctx.fillRect(x, y, width, height);
-	}, [ctx, x, y, width, height, fillStyle]);
-	return null;
-};
-
-interface ImageProps {
-	image: ImageTool;
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-}
-
-const Image: FC<ImageProps> = ({ image, x, y, width, height }) => {
-	const ctx = useCanvasRenderingContext();
-	const canvas = useMemo(() => image.toCanvas(), [image]);
-	useEffect(() => {
-		if (!ctx) {
-			return;
-		}
-		ctx.drawImage(canvas, x, y, width, height);
-	}, [ctx, canvas, image, x, y, width, height]);
-
-	return null;
-};
-
 export const Route = createFileRoute("/image/$imageId")({
 	loader: async ({ params: { imageId } }) => {
 		const image = await dexie.images.where("id").equals(Number(imageId)).first();
@@ -124,11 +44,95 @@ export const Route = createFileRoute("/image/$imageId")({
 	component: () => {
 		const { width, height } = useClientSize();
 		const { tool } = Route.useLoaderData();
+		const [isDragging, setIsDragging] = useState(false);
+		const [position, setPosition] = useState({ x: 0, y: 0 });
+		const [scale, setScale] = useState(1);
+		const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
+		const [isPanning, setIsPanning] = useState(false);
+
+		const handleMouseDown: MouseEventHandler<HTMLCanvasElement> = useCallback((e) => {
+			setIsDragging(true);
+			setLastMousePos({ x: e.clientX, y: e.clientY });
+		}, []);
+
+		// Handle key down event for spacebar
+		const handleKeyDown = useCallback((e: KeyboardEvent) => {
+			if (e.code === "Space") {
+				setIsPanning(true);
+			}
+		}, []);
+
+		// Handle key up event for spacebar
+		const handleKeyUp = useCallback((e: KeyboardEvent) => {
+			if (e.code === "Space") {
+				setIsPanning(false);
+			}
+		}, []);
+
+		useEffect(() => {
+			window.addEventListener("keydown", handleKeyDown);
+			window.addEventListener("keyup", handleKeyUp);
+			return () => {
+				window.removeEventListener("keydown", handleKeyDown);
+				window.removeEventListener("keyup", handleKeyUp);
+			};
+		}, [handleKeyDown, handleKeyUp]);
+
+		// Handle mouse move event for panning
+		const handleMouseMove: MouseEventHandler<HTMLCanvasElement> = useCallback((e) => {
+			if (!isDragging || !isPanning) {
+				return;
+			}
+			const deltaX = e.clientX - lastMousePos.x;
+			const deltaY = e.clientY - lastMousePos.y;
+			setPosition({
+				x: position.x + deltaX,
+				y: position.y + deltaY,
+			});
+			setLastMousePos({
+				x: e.clientX,
+				y: e.clientY,
+			});
+		}, [isPanning, isDragging, lastMousePos, position]);
+
+		// Handle mouse up event to stop dragging
+		const handleMouseUp = useCallback(() => {
+			setIsDragging(false);
+		}, []);
+
+		useEffect(() => {
+			const handleWheel = (e: WheelEvent) => {
+				e.preventDefault();
+				const zoomSensitivity = 0.05;
+				const delta = e.deltaY > 0 ? -zoomSensitivity : zoomSensitivity;
+				const newScale = Math.max(0.1, Math.min(5, scale + delta));
+				setScale(newScale);
+			};
+			window.addEventListener("wheel", handleWheel, { passive: false });
+			return () => {
+				window.removeEventListener("wheel", handleWheel);
+			};
+		}, [scale]);
+
+		const [x, y, w, h] = useMemo(() => {
+			const w = tool.width;
+			const h = tool.height;
+			const x = (width - w) / 2;
+			const y = (height - h) / 2;
+			return [x, y, w, h];
+		}, [tool, width, height]);
 
 		return (
-			<Canvas width={width} height={height}>
-				<Rect x={30} y={30} width={60} height={60} fillStyle="red" />
-				<Image image={tool} x={100} y={100} width={200} height={200} />
+			<Canvas
+				width={width}
+				height={height}
+				onMouseDown={handleMouseDown}
+				onMouseMove={handleMouseMove}
+				onMouseUp={handleMouseUp}
+				onMouseLeave={handleMouseUp}
+				className={cn(isPanning && "cursor-grabbing")}
+			>
+				<Image image={tool} x={x + position.x} y={y + position.y} width={w * scale} height={h * scale} />
 			</Canvas>
 		);
 	},
