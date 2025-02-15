@@ -13,7 +13,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { dexie } from "../lib/db";
+import { dexie } from "~/lib/db";
 
 function useClientSize() {
 	const [size, setSize] = useState({
