@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { useLiveQuery } from "dexie-react-hooks";
 import { dexie } from "../lib/db";
@@ -14,7 +14,9 @@ const ImageList: FC = () => {
 	return (
 		<div className="flex flex-col flex-wrap gap-2 p-2 overflow-y-scroll absolute top-0 left-0">
 			{images.map(image => (
-				<img key={image.id} src={image.dataUrl} alt={image.filename} className="w-32 h-auto rounded-md" />
+				<Link key={image.id} to="/image/$imageId" params={{ imageId: image.id.toString() }}>
+					<img src={image.dataUrl} alt={image.filename} className="w-32 h-auto rounded-md" />
+				</Link>
 			))}
 		</div>
 	);
