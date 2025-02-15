@@ -57,7 +57,7 @@ export const Route = createRootRoute({
 				<ImageList />
 				<Outlet />
 			</div>
-			<TanStackRouterDevtools position="bottom-right" />
+			{import.meta.env.DEV && <TanStackRouterDevtools position="bottom-right" />}
 		</>
 	),
 });
