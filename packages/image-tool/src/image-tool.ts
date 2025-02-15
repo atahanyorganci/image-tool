@@ -318,15 +318,12 @@ export class ImageTool {
 
 	/**
 	 * Exports image to {@link HTMLCanvasElement}.
-	 * @returns A promise that resolves to a new instance of {@link HTMLCanvasElement}.
+	 * @returns A new instance of {@link HTMLCanvasElement}.
 	 */
-	toCanvas(): Promise<HTMLCanvasElement> {
-		return new Promise((resolve) => {
-			const { width, height } = this.canvas;
-			const { canvas, ctx } = emptyCanvas(width, height);
-			ctx.drawImage(this.canvas, 0, 0, width, height);
-			resolve(canvas);
-		});
+	toCanvas(): HTMLCanvasElement {
+		const { canvas, ctx } = emptyCanvas(this.width, this.height);
+		ctx.drawImage(this.canvas, 0, 0, this.width, this.height);
+		return canvas;
 	}
 
 	/**
