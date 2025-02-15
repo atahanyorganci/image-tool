@@ -25,5 +25,9 @@ export function imageTool({ web }: Partial<Options> = {}): FlatConfigComposer<Li
 			quotes: "double",
 			semi: true,
 		},
+	}).append({
+		rules: {
+			"eslint-comments/no-unlimited-disable": ["off"],
+		},
 	});
 }
