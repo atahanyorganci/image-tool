@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useDropzone } from "react-dropzone";
 import { Button } from "../components/button";
 import { dexie } from "../lib/db";
@@ -21,14 +21,13 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 const Dropzone: FC = () => {
+	const router = useRouter();
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		multiple: false,
 		onDrop: async ([files]) => {
 			const dataUrl = await fileToDataUrl(files);
-			await dexie.images.add({
-				filename: files.name,
-				dataUrl,
-			});
+			const id = await dexie.images.add({ filename: files.name, dataUrl });
+			router.navigate({ to: "/image/$imageId", params: { imageId: id.toString() } });
 		},
 	});
 
