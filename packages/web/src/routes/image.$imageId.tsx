@@ -8,10 +8,12 @@ import {
 	IconZoomIn,
 	IconZoomOut,
 } from "@tabler/icons-react";
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { fromImageSource } from "@yorganci/image-tool";
 import {
+	type FC,
 	type MouseEventHandler,
+	type PropsWithChildren,
 	useCallback,
 	useEffect,
 	useMemo,
@@ -20,6 +22,7 @@ import {
 import { Button } from "~/components/button";
 import Canvas from "~/components/canvas/canvas";
 import Image from "~/components/canvas/image";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/tooltip";
 import { dexie } from "~/lib/db";
 import { cn } from "~/lib/utils";
 
@@ -48,6 +51,26 @@ const percentageFormatter = new Intl.NumberFormat("en-US", {
 	maximumFractionDigits: 2,
 });
 
+export interface ActionButtonProps {
+	onClick?: () => void;
+	label: string;
+}
+
+const ActionButton: FC<PropsWithChildren<ActionButtonProps>> = ({ label, onClick, children }) => (
+	<TooltipProvider>
+		<Tooltip>
+			<TooltipTrigger>
+				<Button size="icon" onClick={onClick}>
+					{children}
+				</Button>
+			</TooltipTrigger>
+			<TooltipContent>
+				<p>{label}</p>
+			</TooltipContent>
+		</Tooltip>
+	</TooltipProvider>
+);
+
 export const Route = createFileRoute("/image/$imageId")({
 	loader: async ({ params: { imageId } }) => {
 		const image = await dexie.images.where("id").equals(Number(imageId)).first();
@@ -58,6 +81,7 @@ export const Route = createFileRoute("/image/$imageId")({
 		return { ...image, tool };
 	},
 	component: () => {
+		const router = useRouter();
 		const { width, height } = useClientSize();
 		const { tool } = Route.useLoaderData();
 		const [isDragging, setIsDragging] = useState(false);
@@ -143,24 +167,36 @@ export const Route = createFileRoute("/image/$imageId")({
 				<div className="absolute top-0 left-0 w-full flex justify-center">
 					<div className="p-2 flex bg-primary text-primary-foreground shadow-sm border border-t-0 rounded-b-lg">
 						<div className="flex gap-2 items-center">
-							<Link to="/" aria-label="New Image">
-								<Button size="icon"><IconFilePlus /></Button>
-							</Link>
-							<Button size="icon"><IconFileDownload /></Button>
+							<ActionButton label="New Image" onClick={() => router.navigate({ to: "/"})}>
+								<IconFilePlus />
+							</ActionButton>
+							<ActionButton label="Download">
+								<IconFileDownload />
+							</ActionButton>
 						</div>
 						<div className="w-px bg-border my-1 mx-4" />
 						<div className="flex gap-2 items-center">
-							<Button size="icon"><IconCrop /></Button>
-							<Button size="icon"><IconFlipVertical /></Button>
-							<Button size="icon"><IconFlipHorizontal /></Button>
+							<ActionButton label="Crop">
+								<IconCrop />
+							</ActionButton>
+							<ActionButton label="Flip on vertical axis">
+								<IconFlipVertical />
+							</ActionButton>
+							<ActionButton label="Flip on vertical axis">
+								<IconFlipHorizontal />
+							</ActionButton>
 						</div>
 						<div className="w-px bg-border my-1 mx-4" />
 						<div className="flex gap-2 items-center">
 							<span className="text-sm">
 								{percentageFormatter.format(scale)}
 							</span>
-							<Button size="icon"><IconZoomIn /></Button>
-							<Button size="icon"><IconZoomOut /></Button>
+							<ActionButton label="Zoom in">
+								<IconZoomIn />
+							</ActionButton>
+							<ActionButton label="Zoom out">
+								<IconZoomOut />
+							</ActionButton>
 						</div>
 					</div>
 				</div>
