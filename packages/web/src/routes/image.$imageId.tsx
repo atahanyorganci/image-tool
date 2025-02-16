@@ -1,5 +1,14 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import {
+	IconCrop,
+	IconFileDownload,
+	IconFilePlus,
+	IconFlipHorizontal,
+	IconFlipVertical,
+	IconZoomIn,
+	IconZoomOut,
+} from "@tabler/icons-react";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { fromImageSource } from "@yorganci/image-tool";
 import {
 	type MouseEventHandler,
@@ -8,6 +17,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
+import { Button } from "~/components/button";
 import Canvas from "~/components/canvas/canvas";
 import Image from "~/components/canvas/image";
 import { dexie } from "~/lib/db";
@@ -31,6 +41,12 @@ function useClientSize() {
 
 	return size;
 }
+
+const percentageFormatter = new Intl.NumberFormat("en-US", {
+	style: "percent",
+	minimumFractionDigits: 2,
+	maximumFractionDigits: 2,
+});
 
 export const Route = createFileRoute("/image/$imageId")({
 	loader: async ({ params: { imageId } }) => {
@@ -123,17 +139,43 @@ export const Route = createFileRoute("/image/$imageId")({
 		}, [tool, width, height]);
 
 		return (
-			<Canvas
-				width={width}
-				height={height}
-				onMouseDown={handleMouseDown}
-				onMouseMove={handleMouseMove}
-				onMouseUp={handleMouseUp}
-				onMouseLeave={handleMouseUp}
-				className={cn(isPanning && "cursor-grabbing")}
-			>
-				<Image image={tool} x={x + position.x} y={y + position.y} width={w * scale} height={h * scale} />
-			</Canvas>
+			<>
+				<div className="absolute top-0 left-0 w-full flex justify-center">
+					<div className="p-2 flex bg-primary text-primary-foreground shadow-sm border border-t-0 rounded-b-lg">
+						<div className="flex gap-2 items-center">
+							<Link to="/" aria-label="New Image">
+								<Button size="icon"><IconFilePlus /></Button>
+							</Link>
+							<Button size="icon"><IconFileDownload /></Button>
+						</div>
+						<div className="w-px bg-border my-1 mx-4" />
+						<div className="flex gap-2 items-center">
+							<Button size="icon"><IconCrop /></Button>
+							<Button size="icon"><IconFlipVertical /></Button>
+							<Button size="icon"><IconFlipHorizontal /></Button>
+						</div>
+						<div className="w-px bg-border my-1 mx-4" />
+						<div className="flex gap-2 items-center">
+							<span className="text-sm">
+								{percentageFormatter.format(scale)}
+							</span>
+							<Button size="icon"><IconZoomIn /></Button>
+							<Button size="icon"><IconZoomOut /></Button>
+						</div>
+					</div>
+				</div>
+				<Canvas
+					width={width}
+					height={height}
+					onMouseDown={handleMouseDown}
+					onMouseMove={handleMouseMove}
+					onMouseUp={handleMouseUp}
+					onMouseLeave={handleMouseUp}
+					className={cn(isPanning && "cursor-grabbing")}
+				>
+					<Image image={tool} x={x + position.x} y={y + position.y} width={w * scale} height={h * scale} />
+				</Canvas>
+			</>
 		);
 	},
 });
