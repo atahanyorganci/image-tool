@@ -144,6 +144,8 @@ export interface ImageOptions {
  * ```
  */
 export class ImageTool {
+	private blob: Blob | null = null;
+
 	/**
 	 * Create a {@link ImageTool} instance from {@link HTMLCanvasElement} object.
 	 *
@@ -265,6 +267,9 @@ export class ImageTool {
 	 */
 	toBlob(options: Partial<ImageOptions> = {}): Promise<Blob> {
 		const { mimeType = "image/png", quality = 1 } = options;
+		if (this.blob) {
+			return Promise.resolve(this.blob);
+		}
 		return new Promise((resolve, reject) => {
 			try {
 				this.canvas.toBlob((blob) => {
@@ -272,6 +277,7 @@ export class ImageTool {
 						reject(new Error("Blob unavailable."));
 					}
 					else {
+						this.blob = blob;
 						resolve(blob);
 					}
 				}, mimeType, quality);
