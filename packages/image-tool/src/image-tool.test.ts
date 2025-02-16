@@ -12,7 +12,7 @@ describe("image manipulation", () => {
 		ctx.fillRect(100, 100, 1, 1);
 
 		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const cropped = await source.crop(100, 100, 100, 100).toCanvas();
+		const cropped = source.crop(100, 100, 100, 100).toCanvas();
 
 		expect(cropped.width).toBe(100);
 		expect(cropped.height).toBe(100);
@@ -32,7 +32,7 @@ describe("image manipulation", () => {
 		ctx.fillRect(0, 0, 2, 2);
 
 		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const scaled = await source.scale(100, 100).toCanvas();
+		const scaled = source.scale(100, 100).toCanvas();
 
 		expect(scaled.width).toBe(100);
 		expect(scaled.height).toBe(100);
@@ -49,7 +49,7 @@ describe("image manipulation", () => {
 		ctx.fillRect(0, 0, 200, 400);
 
 		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const thumbnail = await source.thumbnail(100, false).toCanvas();
+		const thumbnail = source.thumbnail(100, false).toCanvas();
 
 		expect(thumbnail.width).toBe(50);
 		expect(thumbnail.height).toBe(100);
@@ -62,7 +62,7 @@ describe("image manipulation", () => {
 		ctx.fillRect(0, 0, 200, 400);
 
 		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const thumbnail = await source.thumbnail(100, true).toCanvas();
+		const thumbnail = source.thumbnail(100, true).toCanvas();
 
 		expect(thumbnail.width).toBe(100);
 		expect(thumbnail.height).toBe(100);
@@ -77,7 +77,7 @@ describe("image manipulation", () => {
 		ctx.fillRect(0, 0, 1, 1);
 
 		const tool = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const flipped = await tool.flipVertical().toCanvas();
+		const flipped = tool.flipVertical().toCanvas();
 
 		expect(flipped.width).toBe(200);
 		expect(flipped.height).toBe(200);
@@ -96,7 +96,7 @@ describe("image manipulation", () => {
 		ctx.fillRect(0, 0, 1, 1);
 
 		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const flipped = await source.flipHorizontal().toCanvas();
+		const flipped = source.flipHorizontal().toCanvas();
 
 		expect(flipped.width).toBe(200);
 		expect(flipped.height).toBe(200);
@@ -115,7 +115,7 @@ describe("image manipulation", () => {
 		ctx.fillRect(0, 0, 1, 1);
 
 		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const rotate45 = await source.rotateDeg(45).toCanvas();
+		const rotate45 = source.rotateDeg(45).toCanvas();
 
 		expect(rotate45.width).toBe(212);
 		expect(rotate45.height).toBe(212);
@@ -130,7 +130,7 @@ describe("image manipulation", () => {
 		ctx.fillRect(0, 0, 1, 1);
 
 		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const rotate90 = await source.rotateDeg(90).toCanvas();
+		const rotate90 = source.rotateDeg(90).toCanvas();
 
 		expect(rotate90.width).toBe(200);
 		expect(rotate90.height).toBe(100);
@@ -149,7 +149,7 @@ describe("image manipulation", () => {
 		ctx.fillRect(0, 0, 1, 1);
 
 		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const rotate180 = await source.rotateDeg(180).toCanvas();
+		const rotate180 = source.rotateDeg(180).toCanvas();
 
 		expect(rotate180.width).toBe(100);
 		expect(rotate180.height).toBe(200);
@@ -168,7 +168,7 @@ describe("image manipulation", () => {
 		ctx.fillRect(0, 0, 1, 1);
 
 		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const rotate270 = await source.rotateDeg(270).toCanvas();
+		const rotate270 = source.rotateDeg(270).toCanvas();
 
 		expect(rotate270.width).toBe(200);
 		expect(rotate270.height).toBe(100);
@@ -187,7 +187,7 @@ describe("image manipulation", () => {
 		ctx.fillRect(0, 0, 1, 1);
 
 		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const rotate360 = await source.rotateDeg(360).toCanvas();
+		const rotate360 = source.rotateDeg(360).toCanvas();
 
 		expect(rotate360.width).toBe(100);
 		expect(rotate360.height).toBe(200);
@@ -205,7 +205,7 @@ describe("image manipulation", () => {
 		ctx.clearRect(0, 0, 10, 10);
 
 		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const background = await source.background("#dddddd").toCanvas();
+		const background = source.background("#dddddd").toCanvas();
 
 		expect(background.width).toBe(100);
 		expect(background.height).toBe(100);

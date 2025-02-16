@@ -298,22 +298,14 @@ export class ImageTool {
 	/**
 	 * Export image as Data URL.
 	 * @param options - Image export options.
-	 * @returns A promise that resolves to a Data URL string.
+	 * @returns A Data URL string.
 	 *
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL | `HTMLCanvasElement.toDataURL`}
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs | Data URLs}
 	 */
-	toDataURL(options: Partial<ImageOptions> = {}): Promise<string> {
+	toDataURL(options: Partial<ImageOptions> = {}): string {
 		const { mimeType = "image/png", quality = 1 } = options;
-		return new Promise((resolve, reject) => {
-			try {
-				resolve(this.canvas.toDataURL(mimeType, quality));
-			}
-			catch (e) {
-				// Probably caused by a tainted canvas (i.e. a resource from a foreign origin.)
-				reject(e);
-			}
-		});
+		return this.canvas.toDataURL(mimeType, quality);
 	}
 
 	/**
@@ -329,10 +321,10 @@ export class ImageTool {
 	/**
 	 * Create {@link HTMLImageElement} from the resulting image.
 	 * @param options - Image export options.
-	 * @returns A promise that resolves to a new instance of {@link HTMLImageElement}.
+	 * @returns A new instance of {@link HTMLImageElement} with the image as source.
 	 */
-	async toImage(options: Partial<ImageOptions>): Promise<HTMLImageElement> {
-		const url = await this.toDataURL(options);
+	toImage(options: Partial<ImageOptions>): HTMLImageElement {
+		const url = this.toDataURL(options);
 		const image = new Image();
 		image.src = url;
 		return image;
@@ -342,10 +334,9 @@ export class ImageTool {
 	 * Downloads the resulting image as a file.
 	 * @param name - Filename.
 	 * @param options - Image export options.
-	 * @returns A promise that resolves when the download starts.
 	 */
-	async toDownload(name: string, options: Partial<ImageOptions> = {}): Promise<void> {
-		const url = await this.toDataURL(options);
+	toDownload(name: string, options: Partial<ImageOptions> = {}): void {
+		const url = this.toDataURL(options);
 		const element = document.createElement("a");
 		element.setAttribute("href", url);
 		element.setAttribute("download", name);
