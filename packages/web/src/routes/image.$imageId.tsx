@@ -7,6 +7,9 @@ import {
 	IconFlipVertical,
 	IconZoomIn,
 	IconZoomOut,
+	IconArrowBackUp,
+	IconArrowForwardUp,
+	IconDeviceFloppy,
 } from "@tabler/icons-react";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { fromImageSource } from "@yorganci/image-tool";
@@ -71,6 +74,31 @@ const ActionButton: FC<PropsWithChildren<ActionButtonProps>> = ({ label, onClick
 	</TooltipProvider>
 );
 
+function useHistory<T>(initial: T) {
+	const [history, setHistory] = useState<T[]>([initial]);
+	const [index, setIndex] = useState(0);
+	const state = history[index];
+
+	const push = useCallback((state: T) => {
+		setHistory((history) => {
+			const newHistory = history.slice(0, index + 1);
+			newHistory.push(state);
+			setIndex(newHistory.length - 1);
+			return newHistory;
+		});
+	}, [index]);
+
+	const undo = useCallback(() => {
+		setIndex((index) => Math.max(0, index - 1));
+	}, []);
+
+	const redo = useCallback(() => {
+		setIndex((index) => Math.min(history.length - 1, index + 1));
+	}, [history]);
+
+	return { state, index, push, undo, redo };
+}
+
 export const Route = createFileRoute("/image/$imageId")({
 	loader: async ({ params: { imageId } }) => {
 		const image = await dexie.images.where("id").equals(Number(imageId)).first();
@@ -83,12 +111,17 @@ export const Route = createFileRoute("/image/$imageId")({
 	component: () => {
 		const router = useRouter();
 		const { width, height } = useClientSize();
-		const { tool } = Route.useLoaderData();
+		const { tool, id } = Route.useLoaderData();
+		const { state: image, push, undo, redo } = useHistory(tool);
 		const [isDragging, setIsDragging] = useState(false);
 		const [position, setPosition] = useState({ x: 0, y: 0 });
 		const [scale, setScale] = useState(1);
 		const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
 		const [isPanning, setIsPanning] = useState(false);
+
+		const saveImage = useCallback(() => {
+			dexie.images.update(id, { dataUrl: image.toDataURL() });
+		}, [id, image]);
 
 		const handleMouseDown: MouseEventHandler<HTMLCanvasElement> = useCallback((e) => {
 			setIsDragging(true);
@@ -155,12 +188,12 @@ export const Route = createFileRoute("/image/$imageId")({
 		}, [scale]);
 
 		const [x, y, w, h] = useMemo(() => {
-			const w = tool.width;
-			const h = tool.height;
+			const w = image.width;
+			const h = image.height;
 			const x = (width - w) / 2;
 			const y = (height - h) / 2;
 			return [x, y, w, h];
-		}, [tool, width, height]);
+		}, [image, width, height]);
 
 		return (
 			<>
@@ -170,8 +203,20 @@ export const Route = createFileRoute("/image/$imageId")({
 							<ActionButton label="New Image" onClick={() => router.navigate({ to: "/"})}>
 								<IconFilePlus />
 							</ActionButton>
-							<ActionButton label="Download">
+							<ActionButton label="Save" onClick={() => saveImage()}>
+								<IconDeviceFloppy />
+							</ActionButton>
+							<ActionButton label="Download" onClick={() => image.toDownload("image.png")}>
 								<IconFileDownload />
+							</ActionButton>
+						</div>
+						<div className="w-px bg-border my-1 mx-4" />
+						<div className="flex gap-2 items-center">
+							<ActionButton label="Undo" onClick={undo}>
+								<IconArrowBackUp />
+							</ActionButton>
+							<ActionButton label="Redo" onClick={redo}>
+								<IconArrowForwardUp />
 							</ActionButton>
 						</div>
 						<div className="w-px bg-border my-1 mx-4" />
@@ -179,10 +224,10 @@ export const Route = createFileRoute("/image/$imageId")({
 							<ActionButton label="Crop">
 								<IconCrop />
 							</ActionButton>
-							<ActionButton label="Flip on vertical axis">
+							<ActionButton label="Flip on vertical axis" onClick={() => push(image.flipHorizontal())}>
 								<IconFlipVertical />
 							</ActionButton>
-							<ActionButton label="Flip on vertical axis">
+							<ActionButton label="Flip on vertical axis" onClick={() => push(image.flipVertical())}>
 								<IconFlipHorizontal />
 							</ActionButton>
 						</div>
@@ -191,10 +236,10 @@ export const Route = createFileRoute("/image/$imageId")({
 							<span className="text-sm">
 								{percentageFormatter.format(scale)}
 							</span>
-							<ActionButton label="Zoom in">
+							<ActionButton label="Zoom in" onClick={() => setScale(Math.min(5, scale + 0.1))}>
 								<IconZoomIn />
 							</ActionButton>
-							<ActionButton label="Zoom out">
+							<ActionButton label="Zoom out" onClick={() => setScale(Math.max(0.1, scale - 0.1))}>
 								<IconZoomOut />
 							</ActionButton>
 						</div>
@@ -209,7 +254,7 @@ export const Route = createFileRoute("/image/$imageId")({
 					onMouseLeave={handleMouseUp}
 					className={cn(isPanning && "cursor-grabbing")}
 				>
-					<Image image={tool} x={x + position.x} y={y + position.y} width={w * scale} height={h * scale} />
+					<Image image={image} x={x + position.x} y={y + position.y} width={w * scale} height={h * scale} />
 				</Canvas>
 			</>
 		);
