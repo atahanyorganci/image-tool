@@ -22,7 +22,7 @@ const ImageList: FC = () => {
 	return (
 		<Sheet>
 			<SheetTrigger asChild>
-				<Button size="icon" className="fixed bottom-4 left-4">
+				<Button size="icon" className="fixed bottom-4 left-4 z-10">
 					<IconHistory />
 				</Button>
 			</SheetTrigger>
