@@ -356,6 +356,9 @@ export class ImageTool {
 	 * @param name - Filename.
 	 * @param options - Image export options.
 	 * @returns A promise that resolves to a new instance of {@link File}.
+	 *
+	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob | `HTMLCanvasElement.toBlob`}
+	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/File | `File`}
 	 */
 	async toFile(name: string, options: Partial<ImageOptions> = {}): Promise<File> {
 		const blob = await this.toBlob(options);
