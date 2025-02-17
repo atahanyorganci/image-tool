@@ -202,6 +202,87 @@ const Image: FC = () => {
 	);
 };
 
+export interface Rect {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
+
+const cropStore = createStore({
+	context: {
+		isCropping: false,
+		x: 0,
+		y: 0,
+		width: 0,
+		height: 0,
+	},
+	on: {
+		init: (ctx, { width, height }: { width: number; height: number }) => ({
+			...ctx,
+			width,
+			height,
+		}),
+		start: ctx => ({
+			...ctx,
+			isCropping: true,
+		}),
+		crop: (ctx) => {
+			const { x, y, width, height } = ctx;
+			console.error({ x, y, width, height });
+			return {
+				...ctx,
+				isCropping: false,
+			};
+		},
+	},
+});
+
+function useCropStore() {
+	const image = useImage();
+	const x = useSelector(cropStore, state => state.context.x);
+	const y = useSelector(cropStore, state => state.context.y);
+	const width = useSelector(cropStore, state => state.context.width);
+	const height = useSelector(cropStore, state => state.context.height);
+
+	useEffect(() => {
+		cropStore.send({ type: "init", width: image.width, height: image.height });
+	}, [image]);
+
+	return { x, y, width, height };
+}
+
+const ImageCropper: FC = () => {
+	const image = useImage();
+	const { x, y, width, height } = useCropStore();
+
+	return (
+		<div
+			className="absolute pointer-events-none"
+			style={{
+				transform: `translate(${image.x}px, ${image.y}px) scale(${image.scale})`,
+				width: image.width,
+				height: image.height,
+			}}
+		>
+			<div
+				className="absolute border-2 border-primary border-dashed grid grid-cols-[10px_1fr_10px] grid-rows-[10px_1fr_10px]"
+				style={{ left: x, top: y, width, height }}
+			>
+				<div className="col-span-1 row-span-1 cursor-nwse-resize" />
+				<div className="col-span-1 row-span-1 cursor-ns-resize" />
+				<div className="col-span-1 row-span-1 cursor-nesw-resize" />
+				<div className="col-span-1 row-span-1 cursor-ew-resize" />
+				<div className="col-span-1 row-span-1 cursor-move" />
+				<div className="col-span-1 row-span-1 cursor-ew-resize" />
+				<div className="col-span-1 row-span-1 cursor-nesw-resize" />
+				<div className="col-span-1 row-span-1 cursor-ns-resize" />
+				<div className="col-span-1 row-span-1 cursor-nwse-resize" />
+			</div>
+		</div>
+	);
+};
+
 function useGlobalWheelHandler() {
 	useEffect(() => {
 		const handleWheel = (e: WheelEvent) => {
@@ -257,6 +338,7 @@ export const Route = createFileRoute("/image/$imageId")({
 		const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
 		const [isPanning, setIsPanning] = useState(false);
 		const scaleFormatted = useScaleFormatted();
+		const isCropping = useSelector(cropStore, state => state.context.isCropping);
 
 		useEffect(() => {
 			imageStore.send({ type: "init", image: tool });
@@ -335,7 +417,7 @@ export const Route = createFileRoute("/image/$imageId")({
 						</div>
 						<div className="w-px bg-border my-1 mx-4" />
 						<div className="flex gap-2 items-center">
-							<ActionButton label="Crop">
+							<ActionButton label="Crop" onClick={() => cropStore.send({ type: "start" })}>
 								<IconCrop />
 							</ActionButton>
 							<ActionButton label="Flip on vertical axis" onClick={() => imageStore.send({ type: "flipHorizontal" })}>
@@ -367,6 +449,7 @@ export const Route = createFileRoute("/image/$imageId")({
 					className={cn("absolute top-0 left-0 size-full", isPanning && "cursor-grabbing")}
 				>
 					<Image />
+					{isCropping && <ImageCropper />}
 				</div>
 			</>
 		);
