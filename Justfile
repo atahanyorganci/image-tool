@@ -13,6 +13,9 @@ check:
 ci:
     pnpm turbo run ci
 
+dev:
+    pnpm turbo run dev
+
 lint:
     pnpm turbo run lint
 

@@ -1,5 +1,6 @@
 {
 	"$schema": "https://turbo.build/schema.json",
+	"ui": "tui",
 	"tasks": {
 		"//#lint": {},
 		"//#lint:fix": {
@@ -24,6 +25,10 @@
 		},
 		"ci": {
 			"dependsOn": ["build", "test", "attw", "api-extractor"]
+		},
+		"dev": {
+			"cache": false,
+			"persistent": true
 		},
 		"lint": {},
 		"lint:fix": {
