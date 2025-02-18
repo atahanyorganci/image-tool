@@ -321,6 +321,16 @@ const ImageCropper: FC = () => {
 				}}
 			>
 			</Resizable>
+			<svg
+				className="absolute inset-0 pointer-events-none"
+				viewBox={`0 0 ${image.width} ${image.height}`}
+			>
+				<path
+					fill="rgba(0,0,0,0.5)"
+					fillRule="evenodd"
+					d={`M0 0H${image.width}V${image.height}H0 ZM${x} ${y}H${x + width}V${y + height}H${x} Z`}
+				/>
+			</svg>
 		</div>
 	);
 };
