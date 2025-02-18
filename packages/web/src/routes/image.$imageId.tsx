@@ -9,6 +9,7 @@ import {
 	IconFilePlus,
 	IconFlipHorizontal,
 	IconFlipVertical,
+	IconX,
 	IconZoomIn,
 	IconZoomOut,
 } from "@tabler/icons-react";
@@ -28,6 +29,7 @@ import {
 	useState,
 } from "react";
 import { Button } from "~/components/button";
+import { Input } from "~/components/inputs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/tooltip";
 import { dexie } from "~/lib/db";
 import { cn } from "~/lib/utils";
@@ -208,8 +210,8 @@ const imageStore = createStore({
 				height,
 				x: (ctx.screenWidth - width) / 2,
 				y: (ctx.screenHeight - height) / 2,
-			}
-		}
+			};
+		},
 	},
 });
 
@@ -247,6 +249,13 @@ export interface Rect {
 	height: number;
 }
 
+function integerClamp(value: number, min: number, max: number) {
+	if (Number.isNaN(value)) {
+		return min;
+	}
+	return Math.min(Math.max(Math.trunc(value), min), max);
+}
+
 const cropStore = createStore({
 	context: {
 		isCropping: false,
@@ -260,17 +269,27 @@ const cropStore = createStore({
 	on: {
 		init: (ctx, { width, height }: { width: number; height: number }) => ({
 			...ctx,
+			x: 0,
+			y: 0,
 			width,
 			height,
 			imageWidth: width,
 			imageHeight: height,
+		}),
+		reset: ctx => ({
+			...ctx,
+			x: 0,
+			y: 0,
+			width: ctx.imageWidth,
+			height: ctx.imageHeight,
+			isCropping: false,
 		}),
 		crop: (ctx) => {
 			if (!ctx.isCropping) {
 				return {
 					...ctx,
 					isCropping: true,
-				}
+				};
 			}
 			const { x, y, width, height } = ctx;
 			imageStore.send({ type: "crop", x, y, width, height });
@@ -279,15 +298,40 @@ const cropStore = createStore({
 				isCropping: false,
 			};
 		},
-		resize: (ctx, rect: Partial<Rect>) => ({
+		resize: (ctx, { x, y, width, height }: Partial<Rect>) => ({
 			...ctx,
-			...rect,
+			x: typeof x === "number" ? integerClamp(x, 0, ctx.imageWidth - ctx.width) : ctx.x,
+			y: typeof y === "number" ? integerClamp(y, 0, ctx.imageHeight - ctx.height) : ctx.y,
+			width: typeof width === "number" ? integerClamp(width, 0, ctx.imageWidth) : ctx.width,
+			height: typeof height === "number" ? integerClamp(height, 0, ctx.imageHeight) : ctx.height,
 		}),
+		aspectRatio: (ctx, { ratio }: { ratio: number }) => {
+			const width = ctx.width;
+			const height = ctx.height;
+			const aspect = width / height;
+			if (aspect > ratio) {
+				const newWidth = Math.trunc(height * ratio);
+				const x = ctx.x + Math.trunc((width - newWidth) / 2);
+				return {
+					...ctx,
+					x,
+					width: newWidth,
+				};
+			}
+			const newHeight = Math.trunc(width / ratio);
+			const y = ctx.y + Math.trunc((height - newHeight) / 2);
+			return {
+				...ctx,
+				y,
+				height: newHeight,
+			};
+		},
 	},
 });
 
 function useCropStore() {
 	const { image } = useImage();
+	const isCropping = useSelector(cropStore, state => state.context.isCropping);
 	const x = useSelector(cropStore, state => state.context.x);
 	const y = useSelector(cropStore, state => state.context.y);
 	const width = useSelector(cropStore, state => state.context.width);
@@ -300,7 +344,7 @@ function useCropStore() {
 		cropStore.send({ type: "init", width: image.width, height: image.height });
 	}, [image]);
 
-	return { x, y, width, height };
+	return { isCropping, x, y, width, height };
 }
 
 const ImageCropper: FC = () => {
@@ -373,6 +417,105 @@ const ImageCropper: FC = () => {
 	);
 };
 
+const ImageCropSheet: FC = () => {
+	const { isCropping, x, y, width, height } = useCropStore();
+
+	return (
+		<div className="fixed z-50 right-0 h-full flex items-center pointer-events-none">
+			<div data-state={isCropping ? "open" : "closed"} className="relative gap-4 bg-card-foreground text-card p-4 transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out inset-y-0 rounded-l-lg shadow-lg border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right flex-col hidden data-[state=open]:flex w-72 pointer-events-auto">
+				<Button size="icon" className="absolute top-4 right-4 border-0 shadow-none" onClick={() => cropStore.send({ type: "reset" })}>
+					<IconX />
+				</Button>
+				<p>Crop Image</p>
+				<div className="flex gap-2 flex-col w-full">
+					<div>
+						<p className="text-sm text-secondary mb-0.5">Position</p>
+						<div className="flex gap-2 items-center">
+							<div className="relative flex items-center">
+								<p className="absolute text-sm left-2 text-secondary">X</p>
+								<Input
+									type="number"
+									className="pl-6"
+									value={x}
+									onChange={(e) => {
+										let value = e.target.valueAsNumber;
+										if (Number.isNaN(value)) {
+											value = 0;
+										}
+										cropStore.send({ type: "resize", x: value });
+									}}
+								/>
+							</div>
+
+							<div className="relative flex items-center">
+								<p className="absolute text-sm left-2 text-secondary">Y</p>
+								<Input
+									type="number"
+									className="pl-6"
+									value={y}
+									onChange={(e) => {
+										let value = e.target.valueAsNumber;
+										if (Number.isNaN(value)) {
+											value = 0;
+										}
+										cropStore.send({ type: "resize", y: value });
+									}}
+								/>
+							</div>
+						</div>
+					</div>
+					<div>
+						<p className="text-sm text-secondary mb-0.5">Dimensions</p>
+						<div className="flex gap-2 items-center">
+							<div className="relative flex items-center">
+								<p className="absolute text-sm left-2 text-secondary">W</p>
+								<Input
+									type="number"
+									className="pl-6"
+									value={width}
+									onChange={(e) => {
+										let value = e.target.valueAsNumber;
+										if (Number.isNaN(value)) {
+											value = 0;
+										}
+										cropStore.send({ type: "resize", width: value });
+									}}
+								/>
+							</div>
+							<div className="relative flex items-center">
+								<p className="absolute text-sm left-2 text-secondary">H</p>
+								<Input
+									type="number"
+									className="pl-6"
+									value={height}
+									onChange={(e) => {
+										let value = e.target.valueAsNumber;
+										if (Number.isNaN(value)) {
+											value = 0;
+										}
+										cropStore.send({ type: "resize", height: value });
+									}}
+								/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div>
+					<p className="text-sm text-secondary">Aspect Ratios</p>
+					<div className="flex gap-2 flex-col w-full">
+						<Button onClick={() => cropStore.send({ type: "aspectRatio", ratio: 1 })}>1:1</Button>
+						<Button onClick={() => cropStore.send({ type: "aspectRatio", ratio: 4 / 3 })}>4:3</Button>
+						<Button onClick={() => cropStore.send({ type: "aspectRatio", ratio: 16 / 9 })}>16:9</Button>
+					</div>
+				</div>
+				<Button variant="secondary" onClick={() => cropStore.send({ type: "crop" })}>
+					Crop
+				</Button>
+			</div>
+		</div>
+	);
+};
+
 function useGlobalWheelHandler() {
 	useEffect(() => {
 		const handleWheel = (e: WheelEvent) => {
@@ -429,6 +572,12 @@ export const Route = createFileRoute("/image/$imageId")({
 		const [isPanning, setIsPanning] = useState(false);
 		const scaleFormatted = useScaleFormatted();
 		const isCropping = useSelector(cropStore, state => state.context.isCropping);
+
+		useEffect(() => {
+			return () => {
+				cropStore.send({ type: "reset" });
+			};
+		}, []);
 
 		useEffect(() => {
 			imageStore.send({ type: "init", image: tool });
@@ -498,7 +647,7 @@ export const Route = createFileRoute("/image/$imageId")({
 						</div>
 						<div className="w-px bg-border my-1 mx-4" />
 						<div className="flex gap-2 items-center">
-							<ActionButton label="Undo" disabled={isCropping}  onClick={() => imageStore.send({ type: "undo" })}>
+							<ActionButton label="Undo" disabled={isCropping} onClick={() => imageStore.send({ type: "undo" })}>
 								<IconArrowBackUp />
 							</ActionButton>
 							<ActionButton label="Redo" disabled={isCropping} onClick={() => imageStore.send({ type: "redo" })}>
@@ -513,7 +662,7 @@ export const Route = createFileRoute("/image/$imageId")({
 							<ActionButton label="Flip on vertical axis" disabled={isCropping} onClick={() => imageStore.send({ type: "flipHorizontal" })}>
 								<IconFlipVertical />
 							</ActionButton>
-							<ActionButton label="Flip on vertical axis"  disabled={isCropping} onClick={() => imageStore.send({ type: "flipVertical" })}>
+							<ActionButton label="Flip on vertical axis" disabled={isCropping} onClick={() => imageStore.send({ type: "flipVertical" })}>
 								<IconFlipHorizontal />
 							</ActionButton>
 						</div>
@@ -540,6 +689,7 @@ export const Route = createFileRoute("/image/$imageId")({
 				>
 					<Image />
 					{isCropping && <ImageCropper />}
+					<ImageCropSheet />
 				</div>
 			</>
 		);
