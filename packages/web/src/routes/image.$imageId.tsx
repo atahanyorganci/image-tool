@@ -174,6 +174,23 @@ const imageStore = createStore({
 				index: ctx.index + 1,
 			};
 		},
+		crop: (ctx, { x, y, width, height }: Rect) => {
+			if (ctx.image.length === 0) {
+				return ctx;
+			}
+			const { image } = ctx.image[ctx.index];
+			const newImage = image.crop(x, y, width, height);
+			const untilNow = ctx.image.slice(0, ctx.index + 1);
+			return {
+				...ctx,
+				image: [...untilNow, { image: newImage, isSaved: false }],
+				index: ctx.index + 1,
+				width,
+				height,
+				x: (ctx.screenWidth - width) / 2,
+				y: (ctx.screenHeight - height) / 2,
+			}
+		}
 	},
 });
 
@@ -229,13 +246,15 @@ const cropStore = createStore({
 			imageWidth: width,
 			imageHeight: height,
 		}),
-		start: ctx => ({
-			...ctx,
-			isCropping: true,
-		}),
 		crop: (ctx) => {
+			if (!ctx.isCropping) {
+				return {
+					...ctx,
+					isCropping: true,
+				}
+			}
 			const { x, y, width, height } = ctx;
-			console.error({ x, y, width, height });
+			imageStore.send({ type: "crop", x, y, width, height });
 			return {
 				...ctx,
 				isCropping: false,
@@ -469,7 +488,7 @@ export const Route = createFileRoute("/image/$imageId")({
 						</div>
 						<div className="w-px bg-border my-1 mx-4" />
 						<div className="flex gap-2 items-center">
-							<ActionButton label="Crop" onClick={() => cropStore.send({ type: "start" })}>
+							<ActionButton label="Crop" onClick={() => cropStore.send({ type: "crop" })}>
 								<IconCrop />
 							</ActionButton>
 							<ActionButton label="Flip on vertical axis" onClick={() => imageStore.send({ type: "flipHorizontal" })}>
