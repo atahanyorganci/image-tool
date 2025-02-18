@@ -1,4 +1,5 @@
-import type { ButtonHTMLAttributes } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import type { ComponentProps, FC } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/utils";
@@ -29,13 +30,13 @@ const buttonVariants = cva(
 	},
 );
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
+export interface ButtonProps extends ComponentProps<"button">, VariantProps<typeof buttonVariants> {
 	asChild?: boolean;
 	leftIcon?: React.ElementType<{ className?: string }, "svg">;
 	rightIcon?: React.ElementType<{ className?: string }, "svg">;
 }
 
-function Button({ ref, className, children, variant, size, asChild = false, leftIcon: LeftIcon, rightIcon: RightIcon, ...props }: ButtonProps & { ref?: React.RefObject<HTMLButtonElement | null> }) {
+const Button: FC<ButtonProps> = ({ className, children, variant, size, asChild = false, leftIcon: LeftIcon, rightIcon: RightIcon, ...props }) => {
 	const Comp = asChild ? Slot : "button";
 	const left = LeftIcon ? <LeftIcon /> : null;
 	const right = RightIcon ? <RightIcon /> : null;
@@ -44,7 +45,6 @@ function Button({ ref, className, children, variant, size, asChild = false, left
 		<Comp
 			type="button"
 			className={cn(buttonVariants({ variant, size, className }))}
-			ref={ref}
 			{...props}
 		>
 			{left}
@@ -52,7 +52,7 @@ function Button({ ref, className, children, variant, size, asChild = false, left
 			{right}
 		</Comp>
 	);
-}
+};
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
