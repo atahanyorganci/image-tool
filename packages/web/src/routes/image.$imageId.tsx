@@ -41,13 +41,14 @@ const percentageFormatter = new Intl.NumberFormat("en-US", {
 export interface ActionButtonProps {
 	onClick?: () => void;
 	label: string;
+	disabled?: boolean;
 }
 
-const ActionButton: FC<PropsWithChildren<ActionButtonProps>> = ({ label, onClick, children }) => (
+const ActionButton: FC<PropsWithChildren<ActionButtonProps>> = ({ label, onClick, children, disabled }) => (
 	<TooltipProvider>
 		<Tooltip>
 			<TooltipTrigger>
-				<Button size="icon" onClick={onClick}>
+				<Button size="icon" onClick={onClick} disabled={disabled}>
 					{children}
 				</Button>
 			</TooltipTrigger>
@@ -497,10 +498,10 @@ export const Route = createFileRoute("/image/$imageId")({
 						</div>
 						<div className="w-px bg-border my-1 mx-4" />
 						<div className="flex gap-2 items-center">
-							<ActionButton label="Undo" onClick={() => imageStore.send({ type: "undo" })}>
+							<ActionButton label="Undo" disabled={isCropping}  onClick={() => imageStore.send({ type: "undo" })}>
 								<IconArrowBackUp />
 							</ActionButton>
-							<ActionButton label="Redo" onClick={() => imageStore.send({ type: "redo" })}>
+							<ActionButton label="Redo" disabled={isCropping} onClick={() => imageStore.send({ type: "redo" })}>
 								<IconArrowForwardUp />
 							</ActionButton>
 						</div>
@@ -509,10 +510,10 @@ export const Route = createFileRoute("/image/$imageId")({
 							<ActionButton label="Crop" onClick={() => cropStore.send({ type: "crop" })}>
 								<IconCrop />
 							</ActionButton>
-							<ActionButton label="Flip on vertical axis" onClick={() => imageStore.send({ type: "flipHorizontal" })}>
+							<ActionButton label="Flip on vertical axis" disabled={isCropping} onClick={() => imageStore.send({ type: "flipHorizontal" })}>
 								<IconFlipVertical />
 							</ActionButton>
-							<ActionButton label="Flip on vertical axis" onClick={() => imageStore.send({ type: "flipVertical" })}>
+							<ActionButton label="Flip on vertical axis"  disabled={isCropping} onClick={() => imageStore.send({ type: "flipVertical" })}>
 								<IconFlipHorizontal />
 							</ActionButton>
 						</div>
