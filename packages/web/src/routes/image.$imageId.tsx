@@ -16,6 +16,7 @@ import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { createStore } from "@xstate/store";
 import { useSelector } from "@xstate/store/react";
 import { fromImageSource } from "@yorganci/image-tool";
+import { Resizable } from "re-resizable";
 import {
 	type FC,
 	type MouseEventHandler,
@@ -23,6 +24,7 @@ import {
 	useCallback,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import { Button } from "~/components/button";
@@ -216,12 +218,16 @@ const cropStore = createStore({
 		y: 0,
 		width: 0,
 		height: 0,
+		imageWidth: 0,
+		imageHeight: 0,
 	},
 	on: {
 		init: (ctx, { width, height }: { width: number; height: number }) => ({
 			...ctx,
 			width,
 			height,
+			imageWidth: width,
+			imageHeight: height,
 		}),
 		start: ctx => ({
 			...ctx,
@@ -235,17 +241,24 @@ const cropStore = createStore({
 				isCropping: false,
 			};
 		},
+		resize: (ctx, rect: Partial<Rect>) => ({
+			...ctx,
+			...rect,
+		}),
 	},
 });
 
 function useCropStore() {
-	const image = useImage();
+	const { image } = useImage();
 	const x = useSelector(cropStore, state => state.context.x);
 	const y = useSelector(cropStore, state => state.context.y);
 	const width = useSelector(cropStore, state => state.context.width);
 	const height = useSelector(cropStore, state => state.context.height);
 
 	useEffect(() => {
+		if (!image) {
+			return;
+		}
 		cropStore.send({ type: "init", width: image.width, height: image.height });
 	}, [image]);
 
@@ -255,30 +268,59 @@ function useCropStore() {
 const ImageCropper: FC = () => {
 	const image = useImage();
 	const { x, y, width, height } = useCropStore();
+	const initial = useRef({ x, y, width, height });
 
 	return (
 		<div
-			className="absolute pointer-events-none"
+			className="absolute"
 			style={{
 				transform: `translate(${image.x}px, ${image.y}px) scale(${image.scale})`,
 				width: image.width,
 				height: image.height,
 			}}
 		>
-			<div
-				className="absolute border-2 border-primary border-dashed grid grid-cols-[10px_1fr_10px] grid-rows-[10px_1fr_10px]"
-				style={{ left: x, top: y, width, height }}
+			<Resizable
+				className="absolute border-2 border-primary border-dashed"
+				style={{ left: x, top: y }}
+				maxWidth={image.width}
+				maxHeight={image.height}
+				size={{ width, height }}
+				bounds="window"
+				onResizeStart={() => {
+					initial.current = { x, y, width, height };
+				}}
+				onResize={(event, direction, _elementRef, { width: deltaX, height: deltaY }) => {
+					event.preventDefault();
+					if (direction === "bottom" || direction === "bottomRight" || direction === "right") {
+						const width = initial.current.width + deltaX;
+						const height = initial.current.height + deltaY;
+						cropStore.send({ type: "resize", width, height });
+					}
+					else if (direction === "left" || direction === "topLeft" || direction === "top") {
+						const x = initial.current.x - deltaX;
+						const y = initial.current.y - deltaY;
+						const width = initial.current.width + deltaX;
+						const height = initial.current.height + deltaY;
+						cropStore.send({ type: "resize", x, y, width, height });
+					}
+					else if (direction === "bottomLeft") {
+						const x = initial.current.x - deltaX;
+						const width = initial.current.width + deltaX;
+						const height = initial.current.height + deltaY;
+						cropStore.send({ type: "resize", x, width, height });
+					}
+					else if (direction === "topRight") {
+						const y = initial.current.y - deltaY;
+						const width = initial.current.width + deltaX;
+						const height = initial.current.height + deltaY;
+						cropStore.send({ type: "resize", y, width, height });
+					}
+				}}
+				onResizeStop={() => {
+					initial.current = { x, y, width, height };
+				}}
 			>
-				<div className="col-span-1 row-span-1 cursor-nwse-resize" />
-				<div className="col-span-1 row-span-1 cursor-ns-resize" />
-				<div className="col-span-1 row-span-1 cursor-nesw-resize" />
-				<div className="col-span-1 row-span-1 cursor-ew-resize" />
-				<div className="col-span-1 row-span-1 cursor-move" />
-				<div className="col-span-1 row-span-1 cursor-ew-resize" />
-				<div className="col-span-1 row-span-1 cursor-nesw-resize" />
-				<div className="col-span-1 row-span-1 cursor-ns-resize" />
-				<div className="col-span-1 row-span-1 cursor-nwse-resize" />
-			</div>
+			</Resizable>
 		</div>
 	);
 };
