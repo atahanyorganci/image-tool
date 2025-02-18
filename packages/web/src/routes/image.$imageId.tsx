@@ -127,18 +127,36 @@ const imageStore = createStore({
 			if (ctx.image.length === 0) {
 				return ctx;
 			}
+			const index = Math.max(0, ctx.index - 1);
+			const width = ctx.image[index].image.width;
+			const height = ctx.image[index].image.height;
+			const x = (ctx.screenWidth - width) / 2;
+			const y = (ctx.screenHeight - height) / 2;
 			return {
 				...ctx,
-				index: Math.max(0, ctx.index - 1),
+				index,
+				width,
+				height,
+				x,
+				y,
 			};
 		},
 		redo: (ctx) => {
 			if (ctx.image.length === 0) {
 				return ctx;
 			}
+			const index = Math.min(ctx.image.length - 1, ctx.index + 1);
+			const width = ctx.image[index].image.width;
+			const height = ctx.image[index].image.height;
+			const x = (ctx.screenWidth - width) / 2;
+			const y = (ctx.screenHeight - height) / 2;
 			return {
 				...ctx,
-				index: Math.min(ctx.image.length - 1, ctx.index + 1),
+				index,
+				width,
+				height,
+				x,
+				y,
 			};
 		},
 		download: (ctx, { filename }: { filename: string }) => {
