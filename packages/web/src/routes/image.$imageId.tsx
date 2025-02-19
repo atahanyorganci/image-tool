@@ -9,6 +9,7 @@ import {
 	IconFilePlus,
 	IconFlipHorizontal,
 	IconFlipVertical,
+	IconResize,
 	IconX,
 	IconZoomIn,
 	IconZoomOut,
@@ -201,6 +202,23 @@ const imageStore = createStore({
 			}
 			const { image } = ctx.image[ctx.index];
 			const newImage = image.crop(x, y, width, height);
+			const untilNow = ctx.image.slice(0, ctx.index + 1);
+			return {
+				...ctx,
+				image: [...untilNow, { image: newImage, isSaved: false }],
+				index: ctx.index + 1,
+				width,
+				height,
+				x: (ctx.screenWidth - width) / 2,
+				y: (ctx.screenHeight - height) / 2,
+			};
+		},
+		resize: (ctx, { width, height }: Pick<Rect, "width" | "height">) => {
+			if (ctx.image.length === 0) {
+				return ctx;
+			}
+			const { image } = ctx.image[ctx.index];
+			const newImage = image.resize(width, height);
 			const untilNow = ctx.image.slice(0, ctx.index + 1);
 			return {
 				...ctx,
@@ -550,6 +568,150 @@ const ImageCropSheet: FC = () => {
 	);
 };
 
+const resizeStore = createStore({
+	context: {
+		isResizing: false,
+		x: 0,
+		y: 0,
+		width: 0,
+		height: 0,
+		imageWidth: 0,
+		imageHeight: 0,
+		lockAspectRatio: true,
+	},
+	on: {
+		init: (ctx, { x, y, width, height }: Rect) => ({
+			...ctx,
+			x,
+			y,
+			width,
+			height,
+			imageWidth: width,
+			imageHeight: height,
+		}),
+		lockAspectRatio: (ctx, { lock }: { lock: boolean }) => ({
+			...ctx,
+			lockAspectRatio: lock,
+		}),
+		change: (ctx, { width, height }: Partial<Pick<Rect, "width" | "height">>) => {
+			const clampedWidth = integerClamp(width ?? ctx.width, 0, ctx.imageWidth);
+			const clampedHeight = integerClamp(height ?? ctx.height, 0, ctx.imageHeight);
+			return {
+				...ctx,
+				width: clampedWidth,
+				height: clampedHeight,
+				x: (ctx.imageWidth - clampedWidth) / 2,
+				y: (ctx.imageHeight - clampedHeight) / 2,
+			};
+		},
+		resize: (ctx) => {
+			if (!ctx.isResizing) {
+				return {
+					...ctx,
+					isResizing: true,
+				};
+			}
+			imageStore.send({ type: "resize", width: ctx.width, height: ctx.height });
+			return {
+				...ctx,
+				isResizing: false,
+			};
+		},
+		reset: ctx => ({
+			...ctx,
+			x: 0,
+			y: 0,
+			width: 0,
+			height: 0,
+			aspectRatio: 1,
+			isResizing: false,
+		}),
+	},
+});
+
+function useResizeStore() {
+	const { image } = useImage();
+	useEffect(() => {
+		if (!image) {
+			return;
+		}
+		resizeStore.send({ type: "init", x: 0, y: 0, width: image.width, height: image.height });
+	}, [image]);
+	return useSelector(resizeStore, state => state.context);
+}
+
+const ImageResizer: FC = () => {
+	const image = useImage();
+	const { x, y, width, height, lockAspectRatio } = useResizeStore();
+	const initial = useRef({ x, y, width, height });
+
+	return (
+		<div
+			className="absolute"
+			style={{
+				transform: `translate(${image.x}px, ${image.y}px) scale(${image.scale})`,
+				width: image.width,
+				height: image.height,
+			}}
+		>
+			<Resizable
+				className="absolute border-2 border-primary border-dashed"
+				style={{ left: x, top: y }}
+				maxWidth={image.width}
+				maxHeight={image.height}
+				size={{ width, height }}
+				bounds="window"
+				onResizeStart={() => {
+					initial.current = { x, y, width, height };
+				}}
+				lockAspectRatio={lockAspectRatio}
+				onResize={(event, direction, _elementRef, { width: deltaX, height: deltaY }) => {
+					event.preventDefault();
+					if (direction === "bottom" || direction === "bottomRight" || direction === "right") {
+						const width = initial.current.width + deltaX;
+						const height = initial.current.height + deltaY;
+						resizeStore.send({ type: "change", width, height });
+					}
+					else if (direction === "left" || direction === "topLeft" || direction === "top") {
+						const width = initial.current.width + deltaX;
+						const height = initial.current.height + deltaY;
+						resizeStore.send({ type: "change", width, height });
+					}
+					else if (direction === "bottomLeft") {
+						const width = initial.current.width + deltaX;
+						const height = initial.current.height + deltaY;
+						resizeStore.send({ type: "change", width, height });
+					}
+					else if (direction === "topRight") {
+						const width = initial.current.width + deltaX;
+						const height = initial.current.height + deltaY;
+						resizeStore.send({ type: "change", width, height });
+					}
+				}}
+				onResizeStop={() => {
+					initial.current = { x, y, width, height };
+				}}
+			>
+				<img
+					className="absolute inset-0"
+					src={image.image?.toDataURL()}
+					style={{ width: width - 4, height: height - 4 }}
+				/>
+			</Resizable>
+			<svg
+				className="absolute inset-0 pointer-events-none"
+				viewBox={`0 0 ${image.width} ${image.height}`}
+			>
+				<path
+					fill="rgba(0,0,0,0.5)"
+					fillRule="evenodd"
+					d={`M0 0H${image.width}V${image.height}H0 ZM${x} ${y}H${x + width}V${y + height}H${x} Z`}
+				/>
+			</svg>
+		</div>
+	);
+};
+
 function useGlobalWheelHandler() {
 	useEffect(() => {
 		const handleWheel = (e: WheelEvent) => {
@@ -606,6 +768,8 @@ export const Route = createFileRoute("/image/$imageId")({
 		const [isPanning, setIsPanning] = useState(false);
 		const scaleFormatted = useScaleFormatted();
 		const isCropping = useSelector(cropStore, state => state.context.isCropping);
+		const isResizing = useSelector(resizeStore, state => state.context.isResizing);
+		const isCroppingOrResizing = isCropping || isResizing;
 
 		useEffect(() => {
 			return () => {
@@ -633,6 +797,10 @@ export const Route = createFileRoute("/image/$imageId")({
 		const handleKeyUp = useCallback((e: KeyboardEvent) => {
 			if (e.code === "Space") {
 				setIsPanning(false);
+			}
+			if (e.code === "Escape") {
+				cropStore.send({ type: "reset" });
+				resizeStore.send({ type: "reset" });
 			}
 		}, []);
 
@@ -681,22 +849,25 @@ export const Route = createFileRoute("/image/$imageId")({
 						</div>
 						<div className="w-px bg-border my-1 mx-4" />
 						<div className="flex gap-2 items-center">
-							<ActionButton label="Undo" disabled={isCropping} onClick={() => imageStore.send({ type: "undo" })}>
+							<ActionButton label="Undo" disabled={isCroppingOrResizing} onClick={() => imageStore.send({ type: "undo" })}>
 								<IconArrowBackUp />
 							</ActionButton>
-							<ActionButton label="Redo" disabled={isCropping} onClick={() => imageStore.send({ type: "redo" })}>
+							<ActionButton label="Redo" disabled={isCroppingOrResizing} onClick={() => imageStore.send({ type: "redo" })}>
 								<IconArrowForwardUp />
 							</ActionButton>
 						</div>
 						<div className="w-px bg-border my-1 mx-4" />
 						<div className="flex gap-2 items-center">
-							<ActionButton label="Crop" onClick={() => cropStore.send({ type: "crop" })}>
+							<ActionButton label="Resize" disabled={isCropping} onClick={() => resizeStore.send({ type: "resize" })}>
+								<IconResize />
+							</ActionButton>
+							<ActionButton label="Crop" disabled={isResizing} onClick={() => cropStore.send({ type: "crop" })}>
 								<IconCrop />
 							</ActionButton>
-							<ActionButton label="Flip on vertical axis" disabled={isCropping} onClick={() => imageStore.send({ type: "flipHorizontal" })}>
+							<ActionButton label="Flip on vertical axis" disabled={isCroppingOrResizing} onClick={() => imageStore.send({ type: "flipHorizontal" })}>
 								<IconFlipVertical />
 							</ActionButton>
-							<ActionButton label="Flip on vertical axis" disabled={isCropping} onClick={() => imageStore.send({ type: "flipVertical" })}>
+							<ActionButton label="Flip on vertical axis" disabled={isCroppingOrResizing} onClick={() => imageStore.send({ type: "flipVertical" })}>
 								<IconFlipHorizontal />
 							</ActionButton>
 						</div>
@@ -724,6 +895,7 @@ export const Route = createFileRoute("/image/$imageId")({
 					<Image />
 					{isCropping && <ImageCropper />}
 					<ImageCropSheet />
+					{isResizing && <ImageResizer />}
 				</div>
 			</>
 		);
