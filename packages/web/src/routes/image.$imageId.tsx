@@ -326,6 +326,11 @@ const cropStore = createStore({
 				height: newHeight,
 			};
 		},
+		move: (ctx, { deltaX, deltaY }: { deltaX: number; deltaY: number }) => ({
+			...ctx,
+			x: integerClamp(ctx.x + deltaX, 0, ctx.imageWidth - ctx.width),
+			y: integerClamp(ctx.y + deltaY, 0, ctx.imageHeight - ctx.height),
+		}),
 	},
 });
 
@@ -347,10 +352,33 @@ function useCropStore() {
 	return { isCropping, x, y, width, height };
 }
 
+interface Position {
+	x: number;
+	y: number;
+}
+
 const ImageCropper: FC = () => {
 	const image = useImage();
 	const { x, y, width, height } = useCropStore();
 	const initial = useRef({ x, y, width, height });
+	const initialDragPosition = useRef<Position | null>(null);
+	const handleMouseDown: MouseEventHandler<HTMLDivElement> = useCallback((e) => {
+		e.preventDefault();
+		initialDragPosition.current = { x: e.clientX, y: e.clientY };
+	}, []);
+	const handleMouseMove: MouseEventHandler<HTMLDivElement> = useCallback((e) => {
+		e.preventDefault();
+		if (!initialDragPosition.current) {
+			return;
+		}
+		const deltaX = e.clientX - initialDragPosition.current.x;
+		const deltaY = e.clientY - initialDragPosition.current.y;
+		initialDragPosition.current = { x: e.clientX, y: e.clientY };
+		cropStore.send({ type: "move", deltaX, deltaY });
+	}, []);
+	const handleMouseUp = useCallback(() => {
+		initialDragPosition.current = null;
+	}, []);
 
 	return (
 		<div
@@ -362,7 +390,7 @@ const ImageCropper: FC = () => {
 			}}
 		>
 			<Resizable
-				className="absolute border-2 border-primary border-dashed"
+				className="absolute border-2 border-primary border-dashed cursor-move"
 				style={{ left: x, top: y }}
 				maxWidth={image.width}
 				maxHeight={image.height}
@@ -402,6 +430,12 @@ const ImageCropper: FC = () => {
 					initial.current = { x, y, width, height };
 				}}
 			>
+				<div
+					className="absolute inset-0"
+					onMouseDown={handleMouseDown}
+					onMouseMove={handleMouseMove}
+					onMouseUp={handleMouseUp}
+				/>
 			</Resizable>
 			<svg
 				className="absolute inset-0 pointer-events-none"
