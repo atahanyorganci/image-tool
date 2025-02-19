@@ -33,54 +33,16 @@ function flip(input: HTMLCanvasElement, direction: Direction): HTMLCanvasElement
 }
 
 /**
- * Generates a thumbnail.
- * @param input - The image to generate a thumbnail from.
- * @param maxSize - Maximum width or height.
- * @param cover - When true this will cause the thumbnail to be a square and image will be centered with its smallest dimension becoming as large as maxDimension and the overflow being cut off. Default: false.
+ * Resizes the image to a new width and height. This will change the size of the canvas to fit new image.
+ * @param input - The image to resize.
+ * @param width - The new width.
+ * @param height - The new height.
+ * @returns A new instance of {@link HTMLCanvasElement} with the resized image.
+ * @internal
  */
-export function thumbnail(input: HTMLCanvasElement, maxSize: number, cover = false): HTMLCanvasElement {
-	let scale = 1;
-	let x = 0;
-	let y = 0;
-	let imageWidth = 0;
-	let imageHeight = 0;
-	let canvasWidth = 0;
-	let canvasHeight = 0;
-
-	if (cover) {
-		if (input.width > input.height) {
-			scale = maxSize / input.height;
-			imageWidth = input.width * scale;
-			imageHeight = maxSize;
-			x = (-1 * (imageWidth - maxSize)) / 2;
-		}
-		else {
-			scale = maxSize / input.width;
-			imageWidth = maxSize;
-			imageHeight = input.height * scale;
-			y = (-1 * (imageHeight - maxSize)) / 2;
-		}
-
-		canvasWidth = maxSize;
-		canvasHeight = maxSize;
-	}
-	else {
-		// If any of the dimensions of the given image is higher than our maxSize
-		// scale the image down, otherwise leave it as is.
-		scale = Math.min(
-			Math.min(maxSize / input.width, maxSize / input.height),
-			1,
-		);
-
-		imageWidth = input.width * scale;
-		imageHeight = input.height * scale;
-		canvasWidth = imageWidth;
-		canvasHeight = imageHeight;
-	}
-
-	const { canvas, ctx } = emptyCanvas(canvasWidth, canvasHeight);
-	ctx.drawImage(input, x, y, imageWidth, imageHeight);
-
+export function resize(input: HTMLCanvasElement, width: number, height: number): HTMLCanvasElement {
+	const { canvas, ctx } = emptyCanvas(width, height);
+	ctx.drawImage(input, 0, 0, width, height);
 	return canvas;
 }
 
@@ -213,13 +175,13 @@ export class ImageTool {
 	}
 
 	/**
-	 * Generates a thumbnail.
-	 * @param maxSize - Maximum width or height.
-	 * @param cover - When true this will cause the thumbnail to be a square and image will be centered with its smallest dimension becoming as large as maxDimension and the overflow being cut off. Default: false.
-	 * @returns A new instance of {@link ImageTool} with the thumbnail.
+	 * Resizes the image to a new width and height. This will change the size of the canvas to fit new image.
+	 * @param width - New width.
+	 * @param height - New height.
+	 * @returns A new instance of {@link ImageTool} with the image resized.
 	 */
-	thumbnail(maxSize: number, cover = false): ImageTool {
-		const canvas = thumbnail(this.canvas, maxSize, cover);
+	resize(width: number, height: number): ImageTool {
+		const canvas = resize(this.canvas, width, height);
 		return new ImageTool(canvas);
 	}
 

@@ -42,30 +42,17 @@ describe("image manipulation", () => {
 		expect(Array.from(data.data)).toEqual([255, 0, 0, 255]);
 	});
 
-	it("creates thumbnails (cover: false)", async () => {
+	it("resizes images", async () => {
 		const canvas = createCanvas(200, 400);
 		const ctx = canvas.getContext("2d");
 		ctx.fillStyle = "#fff";
 		ctx.fillRect(0, 0, 200, 400);
 
 		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const thumbnail = source.thumbnail(100, false).toCanvas();
+		const resized = source.resize(100, 100).toCanvas();
 
-		expect(thumbnail.width).toBe(50);
-		expect(thumbnail.height).toBe(100);
-	});
-
-	it("creates thumbnails (cover: true)", async () => {
-		const canvas = createCanvas(200, 400);
-		const ctx = canvas.getContext("2d");
-		ctx.fillStyle = "#fff";
-		ctx.fillRect(0, 0, 200, 400);
-
-		const source = new ImageTool(canvas as unknown as HTMLCanvasElement);
-		const thumbnail = source.thumbnail(100, true).toCanvas();
-
-		expect(thumbnail.width).toBe(100);
-		expect(thumbnail.height).toBe(100);
+		expect(resized.width).toBe(100);
+		expect(resized.height).toBe(100);
 	});
 
 	it("flips images vertically", async () => {
