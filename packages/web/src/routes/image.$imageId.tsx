@@ -10,7 +10,6 @@ import {
 	IconFlipHorizontal,
 	IconFlipVertical,
 	IconResize,
-	IconX,
 	IconZoomIn,
 	IconZoomOut,
 } from "@tabler/icons-react";
@@ -31,6 +30,7 @@ import {
 } from "react";
 import { Button } from "~/components/button";
 import { Input } from "~/components/inputs";
+import { Pane, PaneClose, PaneContent } from "~/components/pane";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/tooltip";
 import { dexie } from "~/lib/db";
 import { cn } from "~/lib/utils";
@@ -469,15 +469,13 @@ const ImageCropper: FC = () => {
 	);
 };
 
-const ImageCropSheet: FC = () => {
+const CropPane: FC = () => {
 	const { isCropping, x, y, width, height } = useCropStore();
 
 	return (
-		<div className="fixed z-50 right-0 h-full flex items-center pointer-events-none">
-			<div data-state={isCropping ? "open" : "closed"} className="relative gap-4 bg-card-foreground text-card p-4 transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out inset-y-0 rounded-l-lg shadow-lg border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right flex-col hidden data-[state=open]:flex w-72 pointer-events-auto">
-				<Button size="icon" className="absolute top-4 right-4 border-0 shadow-none" onClick={() => cropStore.send({ type: "reset" })}>
-					<IconX />
-				</Button>
+		<Pane isOpen={isCropping} close={() => cropStore.send({ type: "reset" })}>
+			<PaneContent className="w-72">
+				<PaneClose />
 				<p>Crop Image</p>
 				<div className="flex gap-2 flex-col w-full">
 					<div>
@@ -563,8 +561,8 @@ const ImageCropSheet: FC = () => {
 				<Button variant="secondary" onClick={() => cropStore.send({ type: "crop" })}>
 					Crop
 				</Button>
-			</div>
-		</div>
+			</PaneContent>
+		</Pane>
 	);
 };
 
@@ -894,7 +892,7 @@ export const Route = createFileRoute("/image/$imageId")({
 				>
 					<Image />
 					{isCropping && <ImageCropper />}
-					<ImageCropSheet />
+					<CropPane />
 					{isResizing && <ImageResizer />}
 				</div>
 			</>
