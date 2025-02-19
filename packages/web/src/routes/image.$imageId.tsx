@@ -29,6 +29,7 @@ import {
 	useState,
 } from "react";
 import { Button } from "~/components/button";
+import { Checkbox } from "~/components/checkbox";
 import { Input } from "~/components/inputs";
 import { Pane, PaneClose, PaneContent } from "~/components/pane";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/tooltip";
@@ -594,6 +595,25 @@ const resizeStore = createStore({
 		change: (ctx, { width, height }: Partial<Pick<Rect, "width" | "height">>) => {
 			const clampedWidth = integerClamp(width ?? ctx.width, 0, ctx.imageWidth);
 			const clampedHeight = integerClamp(height ?? ctx.height, 0, ctx.imageHeight);
+			if (ctx.lockAspectRatio) {
+				const aspect = ctx.width / ctx.height;
+				if (clampedWidth / clampedHeight > aspect) {
+					return {
+						...ctx,
+						width: Math.trunc(clampedHeight * aspect),
+						height: clampedHeight,
+						x: (ctx.imageWidth - clampedHeight * aspect) / 2,
+						y: (ctx.imageHeight - clampedHeight) / 2,
+					};
+				}
+				return {
+					...ctx,
+					width: clampedWidth,
+					height: Math.trunc(clampedWidth / aspect),
+					x: (ctx.imageWidth - clampedWidth) / 2,
+					y: (ctx.imageHeight - clampedWidth / aspect) / 2,
+				};
+			}
 			return {
 				...ctx,
 				width: clampedWidth,
@@ -707,6 +727,66 @@ const ImageResizer: FC = () => {
 				/>
 			</svg>
 		</div>
+	);
+};
+
+const ResizePane: FC = () => {
+	const { isResizing, width, height, lockAspectRatio } = useResizeStore();
+
+	return (
+		<Pane isOpen={isResizing} close={() => resizeStore.send({ type: "reset" })}>
+			<PaneContent className="w-64">
+				<PaneClose />
+				<p>Resize Image</p>
+				<div className="flex gap-2 flex-col w-full">
+					<div>
+						<p className="text-sm text-secondary mb-0.5">Dimensions</p>
+						<div className="flex gap-2 items-center">
+							<div className="relative flex items-center">
+								<p className="absolute text-sm left-2 text-secondary">W</p>
+								<Input
+									type="number"
+									className="pl-6"
+									value={width}
+									onChange={(e) => {
+										let value = e.target.valueAsNumber;
+										if (Number.isNaN(value)) {
+											value = 0;
+										}
+										resizeStore.send({ type: "change", width: value });
+									}}
+								/>
+							</div>
+							<div className="relative flex items-center">
+								<p className="absolute text-sm left-2 text-secondary">H</p>
+								<Input
+									type="number"
+									className="pl-6"
+									value={height}
+									onChange={(e) => {
+										let value = e.target.valueAsNumber;
+										if (Number.isNaN(value)) {
+											value = 0;
+										}
+										resizeStore.send({ type: "change", height: value });
+									}}
+								/>
+							</div>
+						</div>
+					</div>
+					<div className="flex items-center gap-2">
+						<Checkbox
+							checked={lockAspectRatio}
+							onCheckedChange={state => resizeStore.send({ type: "lockAspectRatio", lock: state === true })}
+						/>
+						<p className="text-sm text-secondary">Lock Aspect Ratio</p>
+					</div>
+				</div>
+				<Button variant="secondary" onClick={() => resizeStore.send({ type: "resize" })}>
+					Resize
+				</Button>
+			</PaneContent>
+		</Pane>
 	);
 };
 
@@ -894,6 +974,7 @@ export const Route = createFileRoute("/image/$imageId")({
 					{isCropping && <ImageCropper />}
 					<CropPane />
 					{isResizing && <ImageResizer />}
+					<ResizePane />
 				</div>
 			</>
 		);
