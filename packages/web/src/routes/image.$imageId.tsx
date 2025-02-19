@@ -72,6 +72,7 @@ function round(value: number, precision: number) {
 
 const imageStore = createStore({
 	context: {
+		id: 0,
 		image: [] as { image: ImageTool; isSaved: boolean }[],
 		index: 0,
 		x: 0,
@@ -90,7 +91,7 @@ const imageStore = createStore({
 			screenWidth: width,
 			screenHeight: height,
 		}),
-		init: (ctx, { image }: { image: ImageTool }) => {
+		init: (ctx, { image, id }: { image: ImageTool; id: number }) => {
 			const maxWidth = Math.trunc(ctx.screenWidth * 0.8);
 			const maxHeight = Math.trunc(ctx.screenHeight * 0.8);
 			const aspect = image.width / image.height;
@@ -98,6 +99,7 @@ const imageStore = createStore({
 			if (image.width <= maxWidth && image.height <= maxHeight) {
 				return {
 					...ctx,
+					id,
 					image: [{ image, isSaved: true }],
 					x: (ctx.screenWidth - image.width) / 2,
 					y: (ctx.screenHeight - image.height) / 2,
@@ -113,6 +115,7 @@ const imageStore = createStore({
 
 				return {
 					...ctx,
+					id,
 					image: [{ image: image.resize(width, height), isSaved: false }],
 					x: (ctx.screenWidth - width) / 2,
 					y: (ctx.screenHeight - height) / 2,
@@ -128,6 +131,7 @@ const imageStore = createStore({
 
 				return {
 					...ctx,
+					id,
 					image: [{ image: image.resize(width, height), isSaved: false }],
 					x: (ctx.screenWidth - width) / 2,
 					y: (ctx.screenHeight - height) / 2,
@@ -150,14 +154,14 @@ const imageStore = createStore({
 			x: ctx.x + deltaX,
 			y: ctx.y + deltaY,
 		}),
-		save: (ctx, event: { id: number }) => {
+		save: (ctx) => {
 			if (ctx.image.length === 0) {
 				return ctx;
 			}
 			const index = ctx.index;
 			const { image } = ctx.image[index];
 			db.images
-				.update(event.id, { dataUrl: image.toDataURL() })
+				.update(ctx.id, { dataUrl: image.toDataURL() })
 				.then(() => {
 					imageStore.send({ type: "setSaved", index });
 				});
@@ -900,8 +904,8 @@ export const Route = createFileRoute("/image/$imageId")({
 		}, []);
 
 		useEffect(() => {
-			imageStore.send({ type: "init", image: tool });
-		}, [tool]);
+			imageStore.send({ type: "init", image: tool, id });
+		}, [tool, id]);
 
 		const handleMouseDown: MouseEventHandler<HTMLDivElement> = useCallback((e) => {
 			setIsDragging(true);
@@ -962,7 +966,7 @@ export const Route = createFileRoute("/image/$imageId")({
 							<ActionButton label="New Image" onClick={() => router.navigate({ to: "/" })}>
 								<IconFilePlus />
 							</ActionButton>
-							<ActionButton label="Save" onClick={() => imageStore.send({ type: "save", id })}>
+							<ActionButton label="Save" onClick={() => imageStore.send({ type: "save" })}>
 								<IconDeviceFloppy />
 							</ActionButton>
 							<ActionButton label="Download" onClick={() => imageStore.send({ type: "download", filename: "image.png" })}>
