@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import type { ImageTool } from "@yorganci/image-tool";
+import type { ImageOptions, ImageTool } from "@yorganci/image-tool";
 import {
 	IconArrowBackUp,
 	IconArrowForwardUp,
@@ -68,6 +68,19 @@ const ZOOM_STEP = 0.1;
 function round(value: number, precision: number) {
 	const multiplier = 10 ** precision;
 	return Math.round(value * multiplier) / multiplier;
+}
+
+function getMimeType(filename: string) {
+	const ext = filename.split(".").pop();
+	if (ext === "png") {
+		return "image/png";
+	}
+	if (ext === "jpeg" || ext === "jpg") {
+		return "image/jpeg";
+	} else if (ext === "webp") {
+		return "image/webp";
+	}
+	throw new Error("Unsupported file type");
 }
 
 const imageStore = createStore({
@@ -212,11 +225,14 @@ const imageStore = createStore({
 				y,
 			};
 		},
-		download: (ctx, { filename }: { filename: string }) => {
+		download: (ctx, { filename, mimeType, quality }: Partial<ImageOptions> & { filename: string }) => {
 			if (ctx.image.length === 0) {
 				return ctx;
 			}
-			ctx.image[ctx.index].image.toDownload(filename);
+			ctx.image[ctx.index].image.toDownload(filename, {
+				mimeType: mimeType ?? getMimeType(filename),
+				quality: quality ?? 1,
+			});
 			return ctx;
 		},
 		flipHorizontal: (ctx) => {
@@ -888,7 +904,7 @@ export const Route = createFileRoute("/image/$imageId")({
 		useClientSize();
 		useGlobalWheelHandler();
 		const router = useRouter();
-		const { tool, id } = Route.useLoaderData();
+		const { tool, id, filename } = Route.useLoaderData();
 		const [isDragging, setIsDragging] = useState(false);
 		const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
 		const [isPanning, setIsPanning] = useState(false);
@@ -969,7 +985,7 @@ export const Route = createFileRoute("/image/$imageId")({
 							<ActionButton label="Save" onClick={() => imageStore.send({ type: "save" })}>
 								<IconDeviceFloppy />
 							</ActionButton>
-							<ActionButton label="Download" onClick={() => imageStore.send({ type: "download", filename: "image.png" })}>
+							<ActionButton label="Download" onClick={() => imageStore.send({ type: "download", filename })}>
 								<IconFileDownload />
 							</ActionButton>
 						</div>
