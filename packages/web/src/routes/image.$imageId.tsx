@@ -65,6 +65,11 @@ const ActionButton: FC<PropsWithChildren<ActionButtonProps>> = ({ label, onClick
 
 const ZOOM_STEP = 0.1;
 
+function round(value: number, precision: number) {
+	const multiplier = 10 ** precision;
+	return Math.round(value * multiplier) / multiplier;
+}
+
 const imageStore = createStore({
 	context: {
 		image: [] as { image: ImageTool; isSaved: boolean }[],
@@ -85,21 +90,60 @@ const imageStore = createStore({
 			screenWidth: width,
 			screenHeight: height,
 		}),
-		init: (ctx, { image }: { image: ImageTool }) => ({
-			...ctx,
-			image: [{ image, isSaved: true }],
-			x: (ctx.screenWidth - image.width) / 2,
-			y: (ctx.screenHeight - image.height) / 2,
-			width: image.width,
-			height: image.height,
-		}),
+		init: (ctx, { image }: { image: ImageTool }) => {
+			const maxWidth = Math.trunc(ctx.screenWidth * 0.8);
+			const maxHeight = Math.trunc(ctx.screenHeight * 0.8);
+			const aspect = image.width / image.height;
+
+			if (image.width <= maxWidth && image.height <= maxHeight) {
+				return {
+					...ctx,
+					image: [{ image, isSaved: true }],
+					x: (ctx.screenWidth - image.width) / 2,
+					y: (ctx.screenHeight - image.height) / 2,
+					width: image.width,
+					height: image.height,
+				};
+			}
+
+			if (aspect > 1) {
+				const width = Math.min(maxWidth, image.width);
+				const height = Math.trunc(width / aspect);
+				const scale = width / image.width;
+
+				return {
+					...ctx,
+					image: [{ image: image.resize(width, height), isSaved: false }],
+					x: (ctx.screenWidth - width) / 2,
+					y: (ctx.screenHeight - height) / 2,
+					scale,
+					width,
+					height,
+				};
+			}
+			else {
+				const height = Math.min(maxHeight, image.height);
+				const width = Math.trunc(height * aspect);
+				const scale = height / image.height;
+
+				return {
+					...ctx,
+					image: [{ image: image.resize(width, height), isSaved: false }],
+					x: (ctx.screenWidth - width) / 2,
+					y: (ctx.screenHeight - height) / 2,
+					scale,
+					width,
+					height,
+				};
+			}
+		},
 		zoomIn: ctx => ({
 			...ctx,
-			scale: Math.min(5, ctx.scale + ZOOM_STEP),
+			scale: Math.min(5, round(ctx.scale + ZOOM_STEP, 1)),
 		}),
 		zoomOut: ctx => ({
 			...ctx,
-			scale: Math.max(0.1, ctx.scale - ZOOM_STEP),
+			scale: Math.max(0.1, round(ctx.scale - ZOOM_STEP, 1)),
 		}),
 		pan: (ctx, { deltaX, deltaY }: { deltaX: number; deltaY: number }) => ({
 			...ctx,
@@ -968,7 +1012,7 @@ export const Route = createFileRoute("/image/$imageId")({
 					onMouseMove={handleMouseMove}
 					onMouseUp={handleMouseUp}
 					onMouseLeave={handleMouseUp}
-					className={cn("absolute top-0 left-0 size-full", isPanning && "cursor-grabbing")}
+					className={cn("absolute top-0 left-0 size-full overflow-hidden", isPanning && "cursor-grabbing")}
 				>
 					<Image />
 					{isCropping && <ImageCropper />}
