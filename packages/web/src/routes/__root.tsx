@@ -5,13 +5,13 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { type FC, useCallback } from "react";
 import { Button } from "../components/button";
 import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "../components/sheet";
-import { dexie } from "../lib/db";
+import { db } from "../lib/db";
 
 const ImageList: FC = () => {
 	const router = useRouter();
-	const images = useLiveQuery(() => dexie.images.orderBy("id").toArray(), []);
+	const images = useLiveQuery(() => db.images.orderBy("id").toArray(), []);
 	const handleClearHistory = useCallback(() => {
-		dexie.images.clear();
+		db.images.clear();
 		router.navigate({ to: "/" });
 	}, [router]);
 

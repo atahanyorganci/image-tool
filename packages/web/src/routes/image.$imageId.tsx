@@ -33,7 +33,7 @@ import { Checkbox } from "~/components/checkbox";
 import { Input } from "~/components/inputs";
 import { Pane, PaneClose, PaneContent } from "~/components/pane";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/tooltip";
-import { dexie } from "~/lib/db";
+import { db } from "~/lib/db";
 import { cn } from "~/lib/utils";
 
 const percentageFormatter = new Intl.NumberFormat("en-US", {
@@ -156,7 +156,7 @@ const imageStore = createStore({
 			}
 			const index = ctx.index;
 			const { image } = ctx.image[index];
-			dexie.images
+			db.images
 				.update(event.id, { dataUrl: image.toDataURL() })
 				.then(() => {
 					imageStore.send({ type: "setSaved", index });
@@ -873,7 +873,7 @@ function useScaleFormatted() {
 
 export const Route = createFileRoute("/image/$imageId")({
 	loader: async ({ params: { imageId } }) => {
-		const image = await dexie.images.where("id").equals(Number(imageId)).first();
+		const image = await db.images.where("id").equals(Number(imageId)).first();
 		if (!image) {
 			throw redirect({ to: "/" });
 		}

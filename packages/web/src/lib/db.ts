@@ -6,12 +6,12 @@ export interface Image {
 	dataUrl: string;
 }
 
-const dexie = new Dexie("ImageDatabase") as Dexie & {
+const db = new Dexie("ImageDatabase") as Dexie & {
 	images: EntityTable<Image, "id">;
 };
 
-dexie.version(1).stores({
+db.version(1).stores({
 	images: "++id, filename, data",
 });
 
-export { dexie };
+export { db };
