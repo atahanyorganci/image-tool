@@ -4,8 +4,8 @@
 @theme {
 	--color-background: hsl(224 71.4% 4.1%);
 	--color-foreground: hsl(210 20% 98%);
-	--color-card: hsl(224 71.4% 4.1%);
-	--color-card-foreground: hsl(210 20% 98%);
+	--color-card: hsl(210 20% 98%);
+	--color-card-foreground: hsl(224 71.4% 4.1%);
 	--color-popover: hsl(224 71.4% 4.1%);
 	--color-popover-foreground: hsl(210 20% 98%);
 	--color-primary: hsl(210 20% 98%);

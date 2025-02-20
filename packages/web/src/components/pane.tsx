@@ -41,7 +41,7 @@ export const PaneContent: FC<ComponentProps<"div">> = ({ className, ...props }) 
 	return (
 		<div
 			data-state={active ? "open" : "closed"}
-			className={cn("relative gap-4 bg-card-foreground text-card p-4 transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out inset-y-0 rounded-l-lg shadow-lg border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right flex-col hidden data-[state=open]:flex pointer-events-auto", className)}
+			className={cn("relative gap-4 bg-card text-card-foreground p-4 transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out inset-y-0 rounded-l-lg shadow-lg border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right flex-col hidden data-[state=open]:flex pointer-events-auto", className)}
 			{...props}
 		/>
 	);
