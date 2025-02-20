@@ -6,6 +6,7 @@ import {
 	IconCrop,
 	IconDeviceFloppy,
 	IconFileDownload,
+	IconFileExport,
 	IconFilePlus,
 	IconFlipHorizontal,
 	IconFlipVertical,
@@ -30,8 +31,10 @@ import {
 } from "react";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Pane, PaneClose, PaneContent } from "~/components/ui/pane";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
 import { db } from "~/lib/db";
 import { cn } from "~/lib/utils";
@@ -75,12 +78,26 @@ function getMimeType(filename: string) {
 	if (ext === "png") {
 		return "image/png";
 	}
-	if (ext === "jpeg" || ext === "jpg") {
+	else if (ext === "jpeg" || ext === "jpg") {
 		return "image/jpeg";
-	} else if (ext === "webp") {
+	}
+	else if (ext === "webp") {
 		return "image/webp";
 	}
 	throw new Error("Unsupported file type");
+}
+
+function getExtension(mimeType: string) {
+	switch (mimeType) {
+		case "image/png":
+			return "png";
+		case "image/jpeg":
+			return "jpeg";
+		case "image/webp":
+			return "webp";
+		default:
+			throw new Error("Unsupported MIME type");
+	}
 }
 
 const imageStore = createStore({
@@ -872,6 +889,73 @@ function useGlobalWheelHandler() {
 	}, []);
 }
 
+const ExportButton: FC = () => {
+	const [type, setType] = useState("image/png");
+	const [quality, setQuality] = useState(1);
+	// eslint-disable-next-line ts/no-use-before-define
+	const { filename } = Route.useLoaderData();
+	const exportFilename = useMemo(() => {
+		const parts = filename.split(".");
+		parts.pop();
+		return `${parts.join(".")}.${getExtension(type)}`;
+	}, [filename, type]);
+
+	return (
+		<Dialog>
+			<DialogTrigger>
+				<ActionButton label="Export">
+					<IconFileExport />
+				</ActionButton>
+			</DialogTrigger>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Export Options</DialogTitle>
+					<DialogDescription>
+						You can export your image in JPEG/PNG/WebP formats.
+						Higher quality images will have larger file sizes.
+					</DialogDescription>
+					<div className="flex justify-between items-center">
+						<p>Quality</p>
+						<Select value={type} onValueChange={value => setType(value)}>
+							<SelectTrigger className="w-32">
+								<SelectValue placeholder="Format" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="image/jpeg">JPEG</SelectItem>
+								<SelectItem value="image/png">PNG</SelectItem>
+								<SelectItem value="image/webp">WebP</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+					<div className="flex items-center justify-between">
+						<p>Quality</p>
+						<Input
+							className="w-24"
+							type="number"
+							min={0}
+							max={1}
+							step={0.01}
+							value={quality}
+							onChange={e => setQuality(e.target.valueAsNumber)}
+						/>
+					</div>
+				</DialogHeader>
+				<DialogFooter>
+					<DialogClose asChild>
+						<Button variant="destructive">Cancel</Button>
+					</DialogClose>
+					<Button
+						variant="secondary"
+						onClick={() => imageStore.send({ type: "download", filename: exportFilename, mimeType: type, quality })}
+					>
+						Export
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+};
+
 function useClientSize() {
 	useEffect(() => {
 		const handleResize = () => {
@@ -988,6 +1072,7 @@ export const Route = createFileRoute("/image/$imageId")({
 							<ActionButton label="Download" onClick={() => imageStore.send({ type: "download", filename })}>
 								<IconFileDownload />
 							</ActionButton>
+							<ExportButton />
 						</div>
 						<div className="w-px bg-border my-1 mx-4" />
 						<div className="flex gap-2 items-center">
