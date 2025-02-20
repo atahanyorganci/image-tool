@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useDropzone } from "react-dropzone";
-import { Button } from "../components/button";
+import { Button } from "../components/ui/button";
 import { db } from "../lib/db";
 
 function fileToDataUrl(file: File): Promise<string> {

@@ -28,11 +28,11 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { Button } from "~/components/button";
-import { Checkbox } from "~/components/checkbox";
-import { Input } from "~/components/inputs";
-import { Pane, PaneClose, PaneContent } from "~/components/pane";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/tooltip";
+import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Input } from "~/components/ui/input";
+import { Pane, PaneClose, PaneContent } from "~/components/ui/pane";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
 import { db } from "~/lib/db";
 import { cn } from "~/lib/utils";
 

@@ -3,8 +3,8 @@ import { createRootRoute, Link, Outlet, useRouter } from "@tanstack/react-router
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { useLiveQuery } from "dexie-react-hooks";
 import { type FC, useCallback } from "react";
-import { Button } from "../components/button";
-import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "../components/sheet";
+import { Button } from "../components/ui/button";
+import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "../components/ui/sheet";
 import { db } from "../lib/db";
 
 const ImageList: FC = () => {
