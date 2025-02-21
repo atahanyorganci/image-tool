@@ -1,4 +1,3 @@
-import type { ImageLike } from "./types";
 import { ImageTool } from "./image-tool";
 import { emptyCanvas, fileToDataURL, isTainted } from "./util";
 
@@ -15,41 +14,47 @@ export function emptyImage(width: number, height: number): ImageTool {
 }
 
 /**
- * Create a new instance of {@link ImageTool} from an {@link ImageLike} object.
- * @param imageLike - The image like object to create the image from.
- * @returns A new instance of {@link ImageTool}.
+ * Create a new instance of {@link ImageTool | `ImageTool`} from an {@link CanvasImageSource | `CanvasImageSource`} object.
+ * @param imageSource - The image like object to create the image from.
+ * @returns A new instance of {@link ImageTool | `ImageTool`}.
  * @public
  */
-export function fromImageLike(imageLike: ImageLike): ImageTool {
+export function fromImageSource(imageSource: CanvasImageSource): ImageTool {
+	let width = 0;
+	let height = 0;
 	if (
-		imageLike instanceof HTMLImageElement
-		&& !imageLike.complete
-		&& imageLike.naturalWidth === 0
+		imageSource instanceof HTMLCanvasElement
+		|| imageSource instanceof ImageBitmap
+		|| imageSource instanceof OffscreenCanvas
 	) {
-		throw new Error("Image is not fully loaded.");
+		width = imageSource.width;
+		height = imageSource.height;
 	}
-	else if (
-		imageLike instanceof HTMLVideoElement
-		&& (imageLike.readyState < 2 || imageLike.ended)
-	) {
-		throw new Error("Video stream is not fully loaded.");
+	else if (imageSource instanceof SVGImageElement) {
+		width = imageSource.width.baseVal.value;
+		height = imageSource.height.baseVal.value;
 	}
-
-	let width = imageLike.width;
-	let height = imageLike.height;
-
-	if (imageLike instanceof HTMLVideoElement) {
-		width = imageLike.videoWidth;
-		height = imageLike.videoHeight;
+	else if (imageSource instanceof HTMLImageElement) {
+		if (!imageSource.complete || imageSource.naturalWidth === 0) {
+			throw new Error("Image is not fully loaded.");
+		}
+		width = imageSource.naturalWidth;
+		height = imageSource.naturalHeight;
 	}
-	else if (imageLike instanceof HTMLImageElement) {
-		width = imageLike.naturalWidth;
-		height = imageLike.naturalHeight;
+	else if (imageSource instanceof HTMLVideoElement) {
+		if (imageSource.readyState < 2 || imageSource.ended) {
+			throw new Error("Video stream is not fully loaded.");
+		}
+		width = imageSource.videoWidth;
+		height = imageSource.videoHeight;
+	}
+	else if (imageSource instanceof VideoFrame) {
+		width = imageSource.displayWidth;
+		height = imageSource.displayHeight;
 	}
 
 	const { canvas, ctx } = emptyCanvas(width, height);
-
-	ctx.drawImage(imageLike, 0, 0, width, height);
+	ctx.drawImage(imageSource, 0, 0, width, height);
 
 	if (isTainted(ctx)) {
 		throw new Error(
@@ -69,7 +74,7 @@ export function fromImageUrl(src: string): Promise<ImageTool> {
 	return new Promise((resolve, reject) => {
 		const image = new Image();
 		image.onload = () => {
-			resolve(fromImageLike(image));
+			resolve(fromImageSource(image));
 		};
 		image.onerror = (err) => {
 			// The image couldn't be loaded.
@@ -108,7 +113,7 @@ export function fromMediaStream(stream: MediaStream): Promise<ImageTool> {
 		video.srcObject = stream;
 		video.play();
 		video.addEventListener("playing", async () => {
-			const imageTool = fromImageLike(video);
+			const imageTool = fromImageSource(video);
 
 			// Stop tracks to get rid of browser's streaming notification.
 			video.srcObject = null;
