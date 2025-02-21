@@ -60,12 +60,12 @@ export function fromImageLike(imageLike: ImageLike): ImageTool {
 }
 
 /**
- * Create a new instance of {@link ImageTool} from an image source.
- * @param src - The image source to create the image from.
+ * Create a new instance of {@link ImageTool} from a URL including data URLs.
+ * @param src - The URL of the image to create the image from.
  * @returns A promise that resolves to a new instance of {@link ImageTool}.
  * @public
  */
-export function fromImageSource(src: string): Promise<ImageTool> {
+export function fromImageUrl(src: string): Promise<ImageTool> {
 	return new Promise((resolve, reject) => {
 		const image = new Image();
 		image.onload = () => {
@@ -88,7 +88,7 @@ export function fromImageSource(src: string): Promise<ImageTool> {
 export async function fromBlob(file: Blob): Promise<ImageTool> {
 	const url = await fileToDataURL(file);
 	if (url) {
-		const image = await fromImageSource(url);
+		const image = await fromImageUrl(url);
 		return image;
 	}
 	else {

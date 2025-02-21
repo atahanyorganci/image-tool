@@ -17,7 +17,7 @@ import {
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { createStore } from "@xstate/store";
 import { useSelector } from "@xstate/store/react";
-import { fromImageSource } from "@yorganci/image-tool";
+import { fromImageUrl } from "@yorganci/image-tool";
 import { Resizable } from "re-resizable";
 import {
 	type FC,
@@ -981,7 +981,7 @@ export const Route = createFileRoute("/image/$imageId")({
 		if (!image) {
 			throw redirect({ to: "/" });
 		}
-		const tool = await fromImageSource(image.dataUrl);
+		const tool = await fromImageUrl(image.dataUrl);
 		return { ...image, tool };
 	},
 	component: () => {

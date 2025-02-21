@@ -2,7 +2,7 @@ export {
 	emptyImage,
 	fromBlob,
 	fromImageLike,
-	fromImageSource,
+	fromImageUrl,
 	fromMediaStream,
 	fromScreen,
 	fromWebcam,
