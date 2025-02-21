@@ -84,7 +84,7 @@ export function rotate(input: HTMLCanvasElement, rad: number): HTMLCanvasElement
  * Options for image export.
  * @public
  */
-export interface ImageOptions {
+export interface ExportOptions {
 	/**
 	 * Mime type of the image format, default is `image/png`.
 	 */
@@ -227,7 +227,7 @@ export class ImageTool {
 	 *
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob | `HTMLCanvasElement.toBlob`}
 	 */
-	toBlob(options: Partial<ImageOptions> = {}): Promise<Blob> {
+	toBlob(options: Partial<ExportOptions> = {}): Promise<Blob> {
 		const { mimeType = "image/png", quality = 1 } = options;
 		if (this.blob) {
 			return Promise.resolve(this.blob);
@@ -258,7 +258,7 @@ export class ImageTool {
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob | `HTMLCanvasElement.toBlob`}
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL | `URL.createObjectURL`}
 	 */
-	async toBlobUrl(options: Partial<ImageOptions> = {}): Promise<string> {
+	async toBlobUrl(options: Partial<ExportOptions> = {}): Promise<string> {
 		const blob = await this.toBlob(options);
 		return URL.createObjectURL(blob);
 	}
@@ -271,7 +271,7 @@ export class ImageTool {
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL | `HTMLCanvasElement.toDataURL`}
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs | Data URLs}
 	 */
-	toDataURL(options: Partial<ImageOptions> = {}): string {
+	toDataURL(options: Partial<ExportOptions> = {}): string {
 		const { mimeType = "image/png", quality = 1 } = options;
 		return this.canvas.toDataURL(mimeType, quality);
 	}
@@ -291,7 +291,7 @@ export class ImageTool {
 	 * @param options - Image export options.
 	 * @returns A new instance of {@link HTMLImageElement} with the image as source.
 	 */
-	toImage(options: Partial<ImageOptions>): HTMLImageElement {
+	toImage(options: Partial<ExportOptions>): HTMLImageElement {
 		const url = this.toDataURL(options);
 		const image = new Image();
 		image.src = url;
@@ -303,7 +303,7 @@ export class ImageTool {
 	 * @param name - Filename.
 	 * @param options - Image export options.
 	 */
-	toDownload(name: string, options: Partial<ImageOptions> = {}): void {
+	toDownload(name: string, options: Partial<ExportOptions> = {}): void {
 		const url = this.toDataURL(options);
 		const element = document.createElement("a");
 		element.setAttribute("href", url);
@@ -322,7 +322,7 @@ export class ImageTool {
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob | `HTMLCanvasElement.toBlob`}
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/File | `File`}
 	 */
-	async toFile(name: string, options: Partial<ImageOptions> = {}): Promise<File> {
+	async toFile(name: string, options: Partial<ExportOptions> = {}): Promise<File> {
 		const blob = await this.toBlob(options);
 		return new File([blob], name);
 	}

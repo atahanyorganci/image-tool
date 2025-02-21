@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import type { ImageOptions, ImageTool } from "@yorganci/image-tool";
+import type { ExportOptions, ImageTool } from "@yorganci/image-tool";
 import {
 	IconArrowBackUp,
 	IconArrowForwardUp,
@@ -242,7 +242,7 @@ const imageStore = createStore({
 				y,
 			};
 		},
-		download: (ctx, { filename, mimeType, quality }: Partial<ImageOptions> & { filename: string }) => {
+		download: (ctx, { filename, mimeType, quality }: Partial<ExportOptions> & { filename: string }) => {
 			if (ctx.image.length === 0) {
 				return ctx;
 			}
