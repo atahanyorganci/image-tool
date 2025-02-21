@@ -65,6 +65,19 @@ export function fromImageSource(imageSource: CanvasImageSource): ImageTool {
 }
 
 /**
+ * Create a new instance of {@link ImageTool} from an {@link ImageData} object.
+ * @param imageData - The image data to create the image from.
+ * @returns A new instance of {@link ImageTool}.
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/ImageData | `ImageData`}
+ * @public
+ */
+export function fromImageData(imageData: ImageData): ImageTool {
+	const { canvas, ctx } = emptyCanvas(imageData.width, imageData.height);
+	ctx.putImageData(imageData, 0, 0);
+	return new ImageTool(canvas);
+}
+
+/**
  * Create a new instance of {@link ImageTool} from a URL including data URLs.
  * @param src - The URL of the image to create the image from.
  * @returns A promise that resolves to a new instance of {@link ImageTool}.

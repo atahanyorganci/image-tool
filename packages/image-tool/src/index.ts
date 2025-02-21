@@ -1,6 +1,7 @@
 export {
 	emptyImage,
 	fromBlob,
+	fromImageData,
 	fromImageSource,
 	fromImageUrl,
 	fromMediaStream,
