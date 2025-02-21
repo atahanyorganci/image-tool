@@ -53,8 +53,8 @@ const ImageList: FC = () => {
 export const Route = createRootRoute({
 	component: () => (
 		<>
-			<div className="min-h-screen flex flex-col w-full">
-				<ImageList />
+			<ImageList />
+			<div className="h-screen w-screen flex flex-col items-center justify-center p-4">
 				<Outlet />
 			</div>
 			{import.meta.env.DEV && <TanStackRouterDevtools position="bottom-right" />}

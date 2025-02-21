@@ -34,13 +34,13 @@ const Dropzone: FC = () => {
 	return (
 		<div
 			{...getRootProps()}
-			className="max-w-5xl cursor-pointer w-full mx-auto flex-1 m-24 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-white"
+			className="max-w-5xl cursor-pointer w-full lg:mx-auto flex-1 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-white"
 		>
 			<input {...getInputProps()} accept="image/*" />
 			{isDragActive && <p>Drop here</p>}
 			{!isDragActive && (
 				<div className="flex flex-col gap-6 items-center">
-					<h1 className="text-2xl font-medium">Choose an image or Drag 'n' Drop.</h1>
+					<h1 className="text-center text-xl md:text-2xl font-medium">Choose an image or Drag 'n' Drop.</h1>
 					<Button size="lg" className="max-w-fit">Choose a File</Button>
 				</div>
 			)}

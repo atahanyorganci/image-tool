@@ -20,6 +20,7 @@ import { useSelector } from "@xstate/store/react";
 import { fromImageUrl } from "@yorganci/image-tool";
 import { Resizable } from "re-resizable";
 import {
+	type ComponentProps,
 	type FC,
 	type MouseEventHandler,
 	type PropsWithChildren,
@@ -64,6 +65,19 @@ const ActionButton: FC<PropsWithChildren<ActionButtonProps>> = ({ label, onClick
 			</TooltipContent>
 		</Tooltip>
 	</TooltipProvider>
+);
+
+const ActionButtonGroup: FC<ComponentProps<"div">> = ({
+	className,
+	children,
+	...props
+}) => (
+	<div
+		className={cn("flex gap-2 items-center", className)}
+		{...props}
+	>
+		{children}
+	</div>
 );
 
 const ZOOM_STEP = 0.1;
@@ -975,6 +989,11 @@ function useScaleFormatted() {
 	return percentageFormatter.format(scale);
 }
 
+const Divider: FC<ComponentProps<"div">> = ({
+	className,
+	...props
+}) => <div className={cn("w-px bg-border my-1 mx-4", className)} {...props} />;
+
 export const Route = createFileRoute("/image/$imageId")({
 	loader: async ({ params: { imageId } }) => {
 		const image = await db.images.where("id").equals(Number(imageId)).first();
@@ -1062,7 +1081,7 @@ export const Route = createFileRoute("/image/$imageId")({
 			<>
 				<div className="absolute top-0 left-0 w-full flex justify-center z-10">
 					<div className="p-2 flex bg-primary text-primary-foreground shadow-sm border border-t-0 rounded-b-lg">
-						<div className="flex gap-2 items-center">
+						<ActionButtonGroup className="hidden md:flex">
 							<ActionButton label="New Image" onClick={() => router.navigate({ to: "/" })}>
 								<IconFilePlus />
 							</ActionButton>
@@ -1073,18 +1092,18 @@ export const Route = createFileRoute("/image/$imageId")({
 								<IconFileDownload />
 							</ActionButton>
 							<ExportButton />
-						</div>
-						<div className="w-px bg-border my-1 mx-4" />
-						<div className="flex gap-2 items-center">
+						</ActionButtonGroup>
+						<Divider className="hidden md:block" />
+						<ActionButtonGroup>
 							<ActionButton label="Undo" disabled={isCroppingOrResizing} onClick={() => imageStore.send({ type: "undo" })}>
 								<IconArrowBackUp />
 							</ActionButton>
 							<ActionButton label="Redo" disabled={isCroppingOrResizing} onClick={() => imageStore.send({ type: "redo" })}>
 								<IconArrowForwardUp />
 							</ActionButton>
-						</div>
-						<div className="w-px bg-border my-1 mx-4" />
-						<div className="flex gap-2 items-center">
+						</ActionButtonGroup>
+						<Divider />
+						<ActionButtonGroup className="hidden md:flex">
 							<ActionButton label="Resize" disabled={isCropping} onClick={() => resizeStore.send({ type: "resize" })}>
 								<IconResize />
 							</ActionButton>
@@ -1097,9 +1116,9 @@ export const Route = createFileRoute("/image/$imageId")({
 							<ActionButton label="Flip on vertical axis" disabled={isCroppingOrResizing} onClick={() => imageStore.send({ type: "flipVertical" })}>
 								<IconFlipHorizontal />
 							</ActionButton>
-						</div>
-						<div className="w-px bg-border my-1 mx-4" />
-						<div className="flex gap-2 items-center">
+						</ActionButtonGroup>
+						<Divider className="hidden md:flex" />
+						<ActionButtonGroup>
 							<span className="text-sm">
 								{scaleFormatted}
 							</span>
@@ -1109,7 +1128,7 @@ export const Route = createFileRoute("/image/$imageId")({
 							<ActionButton label="Zoom out" onClick={() => imageStore.send({ type: "zoomOut" })}>
 								<IconZoomOut />
 							</ActionButton>
-						</div>
+						</ActionButtonGroup>
 					</div>
 				</div>
 				<div
