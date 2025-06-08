@@ -346,7 +346,7 @@ const Image: FC = () => {
 	return (
 		<img
 			src={image?.toDataURL()}
-			className="absolute pointer-events-none"
+			className="pointer-events-none absolute"
 			style={{
 				transform: `translate(${x}px, ${y}px) scale(${scale})`,
 				width,
@@ -504,7 +504,7 @@ const ImageCropper: FC = () => {
 			}}
 		>
 			<Resizable
-				className="absolute border-2 border-primary border-dashed cursor-move"
+				className="absolute cursor-move border-2 border-dashed border-primary"
 				style={{ left: x, top: y }}
 				maxWidth={image.width}
 				maxHeight={image.height}
@@ -552,7 +552,7 @@ const ImageCropper: FC = () => {
 				/>
 			</Resizable>
 			<svg
-				className="absolute inset-0 pointer-events-none"
+				className="pointer-events-none absolute inset-0"
 				viewBox={`0 0 ${image.width} ${image.height}`}
 			>
 				<path
@@ -573,12 +573,12 @@ const CropPane: FC = () => {
 			<PaneContent className="w-72">
 				<PaneClose />
 				<p>Crop Image</p>
-				<div className="flex gap-2 flex-col w-full">
+				<div className="flex w-full flex-col gap-2">
 					<div>
-						<p className="text-sm text-secondary mb-0.5">Position</p>
-						<div className="flex gap-2 items-center">
+						<p className="mb-0.5 text-sm text-secondary">Position</p>
+						<div className="flex items-center gap-2">
 							<div className="relative flex items-center">
-								<p className="absolute text-sm left-2 text-secondary">X</p>
+								<p className="absolute left-2 text-sm text-secondary">X</p>
 								<Input
 									type="number"
 									className="pl-6"
@@ -594,7 +594,7 @@ const CropPane: FC = () => {
 							</div>
 
 							<div className="relative flex items-center">
-								<p className="absolute text-sm left-2 text-secondary">Y</p>
+								<p className="absolute left-2 text-sm text-secondary">Y</p>
 								<Input
 									type="number"
 									className="pl-6"
@@ -611,10 +611,10 @@ const CropPane: FC = () => {
 						</div>
 					</div>
 					<div>
-						<p className="text-sm text-secondary mb-0.5">Dimensions</p>
-						<div className="flex gap-2 items-center">
+						<p className="mb-0.5 text-sm text-secondary">Dimensions</p>
+						<div className="flex items-center gap-2">
 							<div className="relative flex items-center">
-								<p className="absolute text-sm left-2 text-secondary">W</p>
+								<p className="absolute left-2 text-sm text-secondary">W</p>
 								<Input
 									type="number"
 									className="pl-6"
@@ -629,7 +629,7 @@ const CropPane: FC = () => {
 								/>
 							</div>
 							<div className="relative flex items-center">
-								<p className="absolute text-sm left-2 text-secondary">H</p>
+								<p className="absolute left-2 text-sm text-secondary">H</p>
 								<Input
 									type="number"
 									className="pl-6"
@@ -648,7 +648,7 @@ const CropPane: FC = () => {
 				</div>
 				<div>
 					<p className="text-sm text-secondary">Aspect Ratios</p>
-					<div className="flex gap-2 flex-col w-full">
+					<div className="flex w-full flex-col gap-2">
 						<Button onClick={() => cropStore.send({ type: "aspectRatio", ratio: 1 })}>1:1</Button>
 						<Button onClick={() => cropStore.send({ type: "aspectRatio", ratio: 4 / 3 })}>4:3</Button>
 						<Button onClick={() => cropStore.send({ type: "aspectRatio", ratio: 16 / 9 })}>16:9</Button>
@@ -768,7 +768,7 @@ const ImageResizer: FC = () => {
 			}}
 		>
 			<Resizable
-				className="absolute border-2 border-primary border-dashed"
+				className="absolute border-2 border-dashed border-primary"
 				style={{ left: x, top: y }}
 				maxWidth={image.width}
 				maxHeight={image.height}
@@ -812,7 +812,7 @@ const ImageResizer: FC = () => {
 				/>
 			</Resizable>
 			<svg
-				className="absolute inset-0 pointer-events-none"
+				className="pointer-events-none absolute inset-0"
 				viewBox={`0 0 ${image.width} ${image.height}`}
 			>
 				<path
@@ -833,12 +833,12 @@ const ResizePane: FC = () => {
 			<PaneContent className="w-64">
 				<PaneClose />
 				<p>Resize Image</p>
-				<div className="flex gap-2 flex-col w-full">
+				<div className="flex w-full flex-col gap-2">
 					<div>
-						<p className="text-sm text-secondary mb-0.5">Dimensions</p>
-						<div className="flex gap-2 items-center">
+						<p className="mb-0.5 text-sm text-secondary">Dimensions</p>
+						<div className="flex items-center gap-2">
 							<div className="relative flex items-center">
-								<p className="absolute text-sm left-2 text-secondary">W</p>
+								<p className="absolute left-2 text-sm text-secondary">W</p>
 								<Input
 									type="number"
 									className="pl-6"
@@ -853,7 +853,7 @@ const ResizePane: FC = () => {
 								/>
 							</div>
 							<div className="relative flex items-center">
-								<p className="absolute text-sm left-2 text-secondary">H</p>
+								<p className="absolute left-2 text-sm text-secondary">H</p>
 								<Input
 									type="number"
 									className="pl-6"
@@ -928,7 +928,7 @@ const ExportButton: FC = () => {
 						You can export your image in JPEG/PNG/WebP formats.
 						Higher quality images will have larger file sizes.
 					</DialogDescription>
-					<div className="flex justify-between items-center">
+					<div className="flex items-center justify-between">
 						<p>Quality</p>
 						<Select value={type} onValueChange={value => setType(value)}>
 							<SelectTrigger className="w-32">
@@ -1079,8 +1079,8 @@ export const Route = createFileRoute("/image/$imageId")({
 
 		return (
 			<>
-				<div className="absolute top-0 left-0 w-full flex justify-center z-10">
-					<div className="p-2 flex bg-primary text-primary-foreground shadow-sm border border-t-0 rounded-b-lg">
+				<div className="absolute top-0 left-0 z-10 flex w-full justify-center">
+					<div className="flex rounded-b-lg border border-t-0 bg-primary p-2 text-primary-foreground shadow-sm">
 						<ActionButtonGroup className="hidden md:flex">
 							<ActionButton label="New Image" onClick={() => router.navigate({ to: "/" })}>
 								<IconFilePlus />

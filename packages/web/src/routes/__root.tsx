@@ -26,11 +26,11 @@ const ImageList: FC = () => {
 					<IconHistory />
 				</Button>
 			</SheetTrigger>
-			<SheetContent side="left" className="w-48 p-2 flex flex-col">
+			<SheetContent side="left" className="flex w-48 flex-col p-2">
 				<SheetHeader className="mb-4">
 					<SheetTitle>History</SheetTitle>
 				</SheetHeader>
-				<div className="flex flex-col gap-4 overflow-y-scroll items-center flex-1">
+				<div className="flex flex-1 flex-col items-center gap-4 overflow-y-scroll">
 					{images.map(image => (
 						<Link key={image.id} to="/image/$imageId" params={{ imageId: image.id.toString() }}>
 							<img src={image.dataUrl} alt={image.filename} className="rounded" />
@@ -54,7 +54,7 @@ export const Route = createRootRoute({
 	component: () => (
 		<>
 			<ImageList />
-			<div className="h-screen w-screen flex flex-col items-center justify-center p-4">
+			<div className="flex h-screen w-screen flex-col items-center justify-center p-4">
 				<Outlet />
 			</div>
 			{import.meta.env.DEV && <TanStackRouterDevtools position="bottom-right" />}
